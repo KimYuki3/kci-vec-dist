@@ -3,7 +3,7 @@
 **アプリに組み込む、暗号化できるベクトル検索。**
 プロセスの中で動く 1 つのライブラリ。サーバも依存もなく、ノート PC から Xeon まで動きます。
 
-*[English](README.md)*
+*[English](README.md)* · **紹介ページ:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A#ja>
 
 このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度に対応しています。
 

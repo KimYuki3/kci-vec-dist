@@ -3,7 +3,7 @@
 **Embedded vector search, encrypted at rest.**
 One in-process library — no server, no dependencies — from a laptop to a Xeon.
 
-*[日本語](README_ja.md)*
+*[日本語](README_ja.md)* · **Overview page:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A>
 
 This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, cosine similarity.
 
