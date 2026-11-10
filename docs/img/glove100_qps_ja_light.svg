@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-label="glove-100-angular、公式 ANN-Benchmarks の手順 — 各 recall での最良 QPS (高いほど速い)" font-family="system-ui, -apple-system, &quot;Segoe UI&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, sans-serif">
+<rect width="960" height="500" rx="8" fill="#fcfcfb"/>
+<text x="24" y="34" font-size="15" font-weight="600" fill="#0b0b0b">glove-100-angular、公式 ANN-Benchmarks の手順 — 各 recall での最良 QPS (高いほど速い)</text>
+<rect x="24" y="52" width="12" height="12" rx="3" fill="#2a78d6"/>
+<text x="42" y="62.5" font-size="13" fill="#52514e">KCI-Vec グラフ方式</text>
+<rect x="229.23" y="52" width="12" height="12" rx="3" fill="#eb6834"/>
+<text x="247.23" y="62.5" font-size="13" fill="#52514e">KCI-Vec 区分け方式</text>
+<rect x="434.46" y="52" width="12" height="12" rx="3" fill="#1baf7a"/>
+<text x="452.46" y="62.5" font-size="13" fill="#52514e">qsgngt 5.0.0</text>
+<rect x="572.8599999999999" y="52" width="12" height="12" rx="3" fill="#eda100"/>
+<text x="590.8599999999999" y="62.5" font-size="13" fill="#52514e">ScaNN 1.4.2</text>
+<rect x="703.06" y="52" width="12" height="12" rx="3" fill="#e87ba4"/>
+<text x="721.06" y="62.5" font-size="13" fill="#52514e">hnswlib 0.8.0</text>
+<rect x="24" y="76" width="12" height="12" rx="3" fill="#2a78d6" fill-opacity="0.35"/>
+<text x="42" y="86.5" font-size="12" fill="#898781">淡い部分: 繰り返した計測の幅</text>
+<text x="60" y="130" font-size="13" font-weight="600" fill="#0b0b0b">Intel Xeon 8375C (AWS r6id.4xlarge)</text>
+<line x1="100" x2="490" y1="392.0" y2="392.0" stroke="#c3c2b7" stroke-width="1"/>
+<text x="94" y="396.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">0</text>
+<line x1="100" x2="490" y1="329.5" y2="329.5" stroke="#e1e0d9" stroke-width="1"/>
+<text x="94" y="333.5" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">5,000</text>
+<line x1="100" x2="490" y1="267.0" y2="267.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="94" y="271.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">10,000</text>
+<line x1="100" x2="490" y1="204.5" y2="204.5" stroke="#e1e0d9" stroke-width="1"/>
+<text x="94" y="208.5" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">15,000</text>
+<line x1="100" x2="490" y1="142.0" y2="142.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="94" y="146.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">20,000</text>
+<text x="38" y="267.0" font-size="11" fill="#898781" text-anchor="middle" transform="rotate(-90 38 267.0)">1 秒あたりの検索数 (1 コア)</text>
+<path d="M129.3,392.0 L129.3,192.8 Q129.3,188.8 133.3,188.8 L143.3,188.8 Q147.3,188.8 147.3,192.8 L147.3,392.0 Z" fill="#2a78d6"><title>KCI-Vec グラフ方式 — Intel Xeon 8375C (AWS r6id.4xlarge), recall@10 ≥ 0.90: 16,253</title></path>
+<text x="138.3" y="175.9" font-size="11" font-weight="600" text-anchor="middle" fill="#0b0b0b" style="font-variant-numeric: tabular-nums">16,253</text>
+<path d="M149.3,241.9 L149.3,211.9 Q149.3,207.9 153.3,207.9 L163.3,207.9 Q167.3,207.9 167.3,211.9 L167.3,241.9 Z" fill="#eb6834" fill-opacity="0.35"><title>KCI-Vec 区分け方式 — Intel Xeon 8375C (AWS r6id.4xlarge), recall@10 ≥ 0.90: 12,331–14,725</title></path>
+<rect x="149.3" y="237.9" width="18" height="154.1" fill="#eb6834"><title>KCI-Vec 区分け方式 — Intel Xeon 8375C (AWS r6id.4xlarge), recall@10 ≥ 0.90: 12,331–14,725</title></rect>
+<path d="M169.3,191.8 L169.3,185.9 Q169.3,181.9 173.3,181.9 L183.3,181.9 Q187.3,181.9 187.3,185.9 L187.3,191.8 Z" fill="#1baf7a" fill-opacity="0.35"><title>qsgngt 5.0.0 — Intel Xeon 8375C (AWS r6id.4xlarge), recall@10 ≥ 0.90: 16,339–16,809</title></path>
+<rect x="169.3" y="187.8" width="18" height="204.2" fill="#1baf7a"><title>qsgngt 5.0.0 — Intel Xeon 8375C (AWS r6id.4xlarge), recall@10 ≥ 0.90: 16,339–16,809</title></rect>
+<path d="M189.3,340.5 L189.3,339.6 Q189.3,335.6 193.3,335.6 L203.3,335.6 Q207.3,335.6 207.3,339.6 L207.3,340.5 Z" fill="#eda100" fill-opacity="0.35"><title>ScaNN 1.4.2 — Intel Xeon 8375C (AWS r6id.4xlarge), recall@10 ≥ 0.90: 4,438–4,508</title></path>
+<rect x="189.3" y="336.5" width="18" height="55.5" fill="#eda100"><title>ScaNN 1.4.2 — Intel Xeon 8375C (AWS r6id.4xlarge), recall@10 ≥ 0.90: 4,438–4,508</title></rect>
+<text x="168.3" y="412" font-size="12" text-anchor="middle" fill="#52514e">recall@10 ≥ 0.90</text>
+<path d="M256.0,392.0 L256.0,272.9 Q256.0,268.9 260.0,268.9 L270.0,268.9 Q274.0,268.9 274.0,272.9 L274.0,392.0 Z" fill="#2a78d6"><title>KCI-Vec グラフ方式 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.95: 9,851</title></path>
+<text x="265.0" y="253.3" font-size="11" font-weight="600" text-anchor="middle" fill="#0b0b0b" style="font-variant-numeric: tabular-nums">9,851</text>
+<path d="M276.0,287.3 L276.0,264.8 Q276.0,260.8 280.0,260.8 L290.0,260.8 Q294.0,260.8 294.0,264.8 L294.0,287.3 Z" fill="#eb6834" fill-opacity="0.35"><title>KCI-Vec 区分け方式 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.95: 8,694–10,493</title></path>
+<rect x="276.0" y="283.3" width="18" height="108.7" fill="#eb6834"><title>KCI-Vec 区分け方式 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.95: 8,694–10,493</title></rect>
+<path d="M296.0,267.5 L296.0,263.3 Q296.0,259.3 300.0,259.3 L310.0,259.3 Q314.0,259.3 314.0,263.3 L314.0,267.5 Z" fill="#1baf7a" fill-opacity="0.35"><title>qsgngt 5.0.0 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.95: 10,282–10,618</title></path>
+<rect x="296.0" y="263.5" width="18" height="128.5" fill="#1baf7a"><title>qsgngt 5.0.0 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.95: 10,282–10,618</title></rect>
+<path d="M316.0,368.6 L316.0,368.3 Q316.0,364.3 320.0,364.3 L330.0,364.3 Q334.0,364.3 334.0,368.3 L334.0,368.6 Z" fill="#eda100" fill-opacity="0.35"><title>ScaNN 1.4.2 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.95: 2,190–2,219</title></path>
+<rect x="316.0" y="364.6" width="18" height="27.4" fill="#eda100"><title>ScaNN 1.4.2 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.95: 2,190–2,219</title></rect>
+<text x="295.0" y="412" font-size="12" text-anchor="middle" fill="#52514e">≥ 0.95</text>
+<path d="M382.7,392.0 L382.7,340.8 Q382.7,336.8 386.7,336.8 L396.7,336.8 Q400.7,336.8 400.7,340.8 L400.7,392.0 Z" fill="#2a78d6"><title>KCI-Vec グラフ方式 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.99: 4,414</title></path>
+<text x="391.7" y="330.8" font-size="11" font-weight="600" text-anchor="middle" fill="#0b0b0b" style="font-variant-numeric: tabular-nums">4,414</text>
+<path d="M402.7,354.7 L402.7,344.3 Q402.7,340.3 406.7,340.3 L416.7,340.3 Q420.7,340.3 420.7,344.3 L420.7,354.7 Z" fill="#eb6834" fill-opacity="0.35"><title>KCI-Vec 区分け方式 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.99: 3,302–4,138</title></path>
+<rect x="402.7" y="350.7" width="18" height="41.3" fill="#eb6834"><title>KCI-Vec 区分け方式 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.99: 3,302–4,138</title></rect>
+<path d="M422.7,353.4 L422.7,348.6 Q422.7,344.6 426.7,344.6 L436.7,344.6 Q440.7,344.6 440.7,348.6 L440.7,353.4 Z" fill="#1baf7a" fill-opacity="0.35"><title>qsgngt 5.0.0 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.99: 3,408–3,789</title></path>
+<rect x="422.7" y="349.4" width="18" height="42.6" fill="#1baf7a"><title>qsgngt 5.0.0 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.99: 3,408–3,789</title></rect>
+<path d="M442.7,386.2 L442.7,386.1 Q442.7,382.1 446.7,382.1 L456.7,382.1 Q460.7,382.1 460.7,386.1 L460.7,386.2 Z" fill="#eda100" fill-opacity="0.35"><title>ScaNN 1.4.2 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.99: 783–794</title></path>
+<rect x="442.7" y="382.2" width="18" height="9.8" fill="#eda100"><title>ScaNN 1.4.2 — Intel Xeon 8375C (AWS r6id.4xlarge), ≥ 0.99: 783–794</title></rect>
+<text x="421.7" y="412" font-size="12" text-anchor="middle" fill="#52514e">≥ 0.99</text>
+<text x="105" y="434" font-size="11" fill="#898781">hnswlib: この機械では未計測</text>
+<text x="540" y="130" font-size="13" font-weight="600" fill="#0b0b0b">AMD Ryzen 9 9950X</text>
+<line x1="580" x2="970" y1="392.0" y2="392.0" stroke="#c3c2b7" stroke-width="1"/>
+<text x="574" y="396.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">0</text>
+<line x1="580" x2="970" y1="329.5" y2="329.5" stroke="#e1e0d9" stroke-width="1"/>
+<text x="574" y="333.5" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">10,000</text>
+<line x1="580" x2="970" y1="267.0" y2="267.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="574" y="271.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">20,000</text>
+<line x1="580" x2="970" y1="204.5" y2="204.5" stroke="#e1e0d9" stroke-width="1"/>
+<text x="574" y="208.5" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">30,000</text>
+<line x1="580" x2="970" y1="142.0" y2="142.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="574" y="146.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric: tabular-nums">40,000</text>
+<text x="518" y="267.0" font-size="11" fill="#898781" text-anchor="middle" transform="rotate(-90 518 267.0)">1 秒あたりの検索数 (1 コア)</text>
+<path d="M599.3,392.0 L599.3,165.1 Q599.3,161.1 603.3,161.1 L613.3,161.1 Q617.3,161.1 617.3,165.1 L617.3,392.0 Z" fill="#2a78d6"><title>KCI-Vec グラフ方式 — AMD Ryzen 9 9950X, recall@10 ≥ 0.90: 36,951</title></path>
+<text x="608.3" y="155.1" font-size="11" font-weight="600" text-anchor="middle" fill="#0b0b0b" style="font-variant-numeric: tabular-nums">36,951</text>
+<path d="M619.3,392.0 L619.3,179.3 Q619.3,175.3 623.3,175.3 L633.3,175.3 Q637.3,175.3 637.3,179.3 L637.3,392.0 Z" fill="#eb6834"><title>KCI-Vec 区分け方式 — AMD Ryzen 9 9950X, recall@10 ≥ 0.90: 34,670</title></path>
+<path d="M639.3,392.0 L639.3,223.0 Q639.3,219.0 643.3,219.0 L653.3,219.0 Q657.3,219.0 657.3,223.0 L657.3,392.0 Z" fill="#1baf7a"><title>qsgngt 5.0.0 — AMD Ryzen 9 9950X, recall@10 ≥ 0.90: 27,678</title></path>
+<path d="M659.3,392.0 L659.3,298.4 Q659.3,294.4 663.3,294.4 L673.3,294.4 Q677.3,294.4 677.3,298.4 L677.3,392.0 Z" fill="#eda100"><title>ScaNN 1.4.2 — AMD Ryzen 9 9950X, recall@10 ≥ 0.90: 15,611</title></path>
+<path d="M679.3,392.0 L679.3,369.3 Q679.3,365.3 683.3,365.3 L693.3,365.3 Q697.3,365.3 697.3,369.3 L697.3,392.0 Z" fill="#e87ba4"><title>hnswlib 0.8.0 — AMD Ryzen 9 9950X, recall@10 ≥ 0.90: 4,268</title></path>
+<text x="648.3" y="412" font-size="12" text-anchor="middle" fill="#52514e">recall@10 ≥ 0.90</text>
+<path d="M726.0,392.0 L726.0,259.8 Q726.0,255.8 730.0,255.8 L740.0,255.8 Q744.0,255.8 744.0,259.8 L744.0,392.0 Z" fill="#2a78d6"><title>KCI-Vec グラフ方式 — AMD Ryzen 9 9950X, ≥ 0.95: 21,800</title></path>
+<text x="735.0" y="234.0" font-size="11" font-weight="600" text-anchor="middle" fill="#0b0b0b" style="font-variant-numeric: tabular-nums">21,800</text>
+<path d="M746.0,392.0 L746.0,244.0 Q746.0,240.0 750.0,240.0 L760.0,240.0 Q764.0,240.0 764.0,244.0 L764.0,392.0 Z" fill="#eb6834"><title>KCI-Vec 区分け方式 — AMD Ryzen 9 9950X, ≥ 0.95: 24,321</title></path>
+<path d="M766.0,392.0 L766.0,301.7 Q766.0,297.7 770.0,297.7 L780.0,297.7 Q784.0,297.7 784.0,301.7 L784.0,392.0 Z" fill="#1baf7a"><title>qsgngt 5.0.0 — AMD Ryzen 9 9950X, ≥ 0.95: 15,089</title></path>
+<path d="M786.0,392.0 L786.0,344.8 Q786.0,340.8 790.0,340.8 L800.0,340.8 Q804.0,340.8 804.0,344.8 L804.0,392.0 Z" fill="#eda100"><title>ScaNN 1.4.2 — AMD Ryzen 9 9950X, ≥ 0.95: 8,195</title></path>
+<path d="M806.0,392.0 L806.0,384.1 Q806.0,380.1 810.0,380.1 L820.0,380.1 Q824.0,380.1 824.0,384.1 L824.0,392.0 Z" fill="#e87ba4"><title>hnswlib 0.8.0 — AMD Ryzen 9 9950X, ≥ 0.95: 1,898</title></path>
+<text x="775.0" y="412" font-size="12" text-anchor="middle" fill="#52514e">≥ 0.95</text>
+<path d="M852.7,392.0 L852.7,337.0 Q852.7,333.0 856.7,333.0 L866.7,333.0 Q870.7,333.0 870.7,337.0 L870.7,392.0 Z" fill="#2a78d6"><title>KCI-Vec グラフ方式 — AMD Ryzen 9 9950X, ≥ 0.99: 9,440</title></path>
+<text x="861.7" y="325.1" font-size="11" font-weight="600" text-anchor="middle" fill="#0b0b0b" style="font-variant-numeric: tabular-nums">9,440</text>
+<path d="M872.7,392.0 L872.7,335.1 Q872.7,331.1 876.7,331.1 L886.7,331.1 Q890.7,331.1 890.7,335.1 L890.7,392.0 Z" fill="#eb6834"><title>KCI-Vec 区分け方式 — AMD Ryzen 9 9950X, ≥ 0.99: 9,747</title></path>
+<path d="M892.7,392.0 L892.7,357.9 Q892.7,353.9 896.7,353.9 L906.7,353.9 Q910.7,353.9 910.7,357.9 L910.7,392.0 Z" fill="#1baf7a"><title>qsgngt 5.0.0 — AMD Ryzen 9 9950X, ≥ 0.99: 6,099</title></path>
+<path d="M912.7,392.0 L912.7,376.7 Q912.7,372.7 916.7,372.7 L926.7,372.7 Q930.7,372.7 930.7,376.7 L930.7,392.0 Z" fill="#eda100"><title>ScaNN 1.4.2 — AMD Ryzen 9 9950X, ≥ 0.99: 3,085</title></path>
+<path d="M932.7,392.0 L932.7,391.7 Q932.7,387.7 936.7,387.7 L946.7,387.7 Q950.7,387.7 950.7,391.7 L950.7,392.0 Z" fill="#e87ba4"><title>hnswlib 0.8.0 — AMD Ryzen 9 9950X, ≥ 0.99: 685</title></path>
+<text x="901.7" y="412" font-size="12" text-anchor="middle" fill="#52514e">≥ 0.99</text>
+<text x="24" y="482" font-size="11.5" fill="#898781">開発者自身の計測で、第三者の確認はまだありません。パネルごとに目盛りが違います。</text>
+</svg>
