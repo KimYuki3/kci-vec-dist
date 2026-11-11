@@ -5,7 +5,7 @@
 
 *[English](README.md)* · **紹介ページ:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A#ja>
 
-このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度に対応しています。
+このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度とユークリッド (L2) 距離に対応しています。
 
 ---
 
@@ -46,6 +46,23 @@ recall@10 が 0.90 / 0.95 / 0.99 以上での最良 QPS (1 秒あたりの検索
 - **すべて開発者自身の計測で、第三者による確認はまだありません。** ann-benchmarks.com の数字とは比べていません (時期も機械も違うため)。
 - 順位は CPU と目標の recall で変わります。一般的な順位ではなく、特定の条件での計測としてご覧ください。
 
+### ユークリッド (L2) 距離の速さ
+
+sift-128-euclidean (100 万件 × 128 次元)。上と同じ計測の道具と条件で、AMD Ryzen 9 9950X、wheel 0.2.0 です。
+recall@10 が 0.90 / 0.95 / 0.99 以上になる設定のうち、いちばん速い QPS です。
+
+| 算法 | AMD Ryzen 9 9950X |
+|---|---|
+| **KCI-Vec 区分け方式** | **53,001 / 40,297 / 20,155** |
+| **KCI-Vec グラフ方式** (詰めた配置、先行版) | 51,332 / 39,317 / 12,971 |
+| ScaNN 1.4.2 (公式の全設定) | 23,563 / 16,494 / 8,504 |
+| hnswlib 0.8.0 (公式の全設定) | 20,294 / 13,807 / 6,502 |
+
+- どれも 1 回ずつの、開発者自身の計測です。第三者による確認はまだありません。
+- グラフ方式の 0.99 の値は、最初の計測 (recall 0.98 まで) のあとに設定を足して計ったものです。
+- qsgngt は載せていません。配布されているバイナリが、私たちの環境ではこのデータで結果を出せませんでした。
+- sift-128 は長さのそろったデータです。長さが大きく違うデータでは、同じ recall を出すのにより多くの手間が要ります (制限の節)。
+
 ---
 
 ## 2 つの探し方
@@ -60,13 +77,13 @@ recall@10 が 0.90 / 0.95 / 0.99 以上での最良 QPS (1 秒あたりの検索
 ## 入れ方
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.1.1/kci_vec-0.1.1-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.0/kci_vec-0.2.0-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 必要なもの: Linux x86-64 (glibc 2.35 以降。例えば Ubuntu 22.04 以降、Debian 12 以降)、AVX2 のある CPU (AVX-512 があれば使います)、
 Python 3.8 以降、NumPy。
 
-wheel の sha256: `8041d142e2e6a7f468583dbf389b877e58ffacf580ab104cdf51ec2110e2920b`
+wheel の sha256: `410169d09406bc48b43f8186e0ef81fb737b7168340977cd78e8047e1eace508`
 
 ---
 
@@ -92,11 +109,29 @@ v2 = KciVec.load("index.kv", key=b"a long secret")
 
 点数は cosine 類似度で、高い順に返ります。たくさんの質問をまとめて探すときは、`v.search_many(queries, k=10)` が `(ids, scores)` の配列を返します。
 
+### ユークリッド (L2) 距離
+
+0.2.0 からの機能です。速さは上の「速さ」の節にあります。`metric="l2"` を渡します。ベクトルの長さはそのまま保たれます (正規化しません)。2 つの探し方、絞り込み、
+暗号化した保存と読み込みは、cosine のときと同じように使えます。
+
+```python
+v = KciVec(dim=128, rerank=200, metric="l2")
+v.add_many(range(len(vectors)), vectors)
+v.build_lists()                            # グラフ方式なら v.build()
+
+for doc_id, dist2 in v.search(query, k=10):   # 距離の 2 乗 |q - x|^2、小さい順
+    ...
+```
+
+ユークリッド距離を cosine の索引に写す方法は、特許出願中です (特願2026-241178)。この表示は、その方法だけについてのものです。
+
 ---
 
 ## 評価用の部品の制限
 
-- Linux x86-64 のみ、cosine 類似度のみです。
+- Linux x86-64 のみです。cosine 類似度とユークリッド (L2) 距離に対応し、内積には対応していません。
+- L2: ベクトルの長さが大きく違う (およそ 4 倍を超える) データでは、同じ再現率を出すのに、区分け方式の `nprobe` / `rerank_n` を
+  cosine のときより大きくする必要があります。
 - グラフ方式の詰めた配置は先行版です。まだ保存できず、追加すると作り直すまで外れます。
 - 書き込みは 1 本ずつです。探している最中に索引を変えないでください。
 - 作る間は float のベクトルをメモリに持ちます。SSD に置いたまま探す索引はまだありません。

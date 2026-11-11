@@ -5,7 +5,7 @@ One in-process library — no server, no dependencies — from a laptop to a Xeo
 
 *[日本語](README_ja.md)* · **Overview page:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A>
 
-This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, cosine similarity.
+This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity and Euclidean (L2) distance.
 
 ---
 
@@ -47,6 +47,23 @@ per setting. Best QPS at recall@10 ≥ 0.90 / 0.95 / 0.99.
   with the figures on ann-benchmarks.com, which were taken at another time on other machines.
 - Rankings depend on the CPU and the recall target; treat these as specific measurements, not a general ranking.
 
+### Speed with Euclidean (L2) distance
+
+sift-128-euclidean (1 M × 128), same harness and conditions, AMD Ryzen 9 9950X, wheel 0.2.0. Best QPS at
+recall@10 ≥ 0.90 / 0.95 / 0.99.
+
+| algorithm | AMD Ryzen 9 9950X |
+|---|---|
+| **KCI-Vec — partitioned** | **53,001 / 40,297 / 20,155** |
+| **KCI-Vec — graph** (compact layout, preview) | 51,332 / 39,317 / 12,971 |
+| ScaNN 1.4.2 (full official config) | 23,563 / 16,494 / 8,504 |
+| hnswlib 0.8.0 (full official config) | 20,294 / 13,807 / 6,502 |
+
+- One run each, the author's own measurements, not independently verified.
+- The graph's 0.99 figure comes from settings added after the first run (which stopped at recall 0.98).
+- qsgngt is not listed: its binary distribution did not produce results on this dataset in our environment.
+- sift-128 vectors have similar lengths; data with widely differing lengths needs more work for the same recall (see Limitations).
+
 ---
 
 ## Two index types
@@ -62,13 +79,13 @@ Both support encrypted save / load, metadata filtering and float re-ranking.
 ## Install
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.1.1/kci_vec-0.1.1-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.0/kci_vec-0.2.0-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 Requirements: Linux x86-64 with glibc 2.35 or later (e.g. Ubuntu 22.04+, Debian 12+), a CPU with AVX2 (AVX-512 is
 used when present), Python 3.8+, NumPy.
 
-sha256 of the wheel: `8041d142e2e6a7f468583dbf389b877e58ffacf580ab104cdf51ec2110e2920b`
+sha256 of the wheel: `410169d09406bc48b43f8186e0ef81fb737b7168340977cd78e8047e1eace508`
 
 ---
 
@@ -95,11 +112,30 @@ v2 = KciVec.load("index.kv", key=b"a long secret")
 Scores are cosine similarities, highest first. For many queries at once, `v.search_many(queries, k=10)` returns
 `(ids, scores)` arrays.
 
+### Euclidean (L2) distance
+
+New in 0.2.0. Pass `metric="l2"`; the vectors keep their length (they are not normalized), and both index types,
+filtering and encrypted save / load work as for cosine.
+
+```python
+v = KciVec(dim=128, rerank=200, metric="l2")
+v.add_many(range(len(vectors)), vectors)
+v.build_lists()                            # or v.build() for the graph
+
+for doc_id, dist2 in v.search(query, k=10):   # squared distance |q - x|^2, smallest first
+    ...
+```
+
+The method that maps Euclidean distance onto the cosine index is patent pending
+(Japanese Patent Application No. 2026-241178). This notice covers that method only.
+
 ---
 
 ## Limitations of the evaluation build
 
-- Linux x86-64 only, cosine similarity only.
+- Linux x86-64 only. Cosine similarity and Euclidean (L2) distance; inner product is not supported.
+- L2: when vector lengths differ widely (more than about 4×), the partitioned index needs a larger `nprobe` /
+  `rerank_n` than a cosine index for the same recall.
 - The compact graph layout is a preview: it is not saved yet, and an insert drops it until it is rebuilt.
 - One writer at a time: do not modify an index while searching it.
 - During a build the float vectors are held in memory; an SSD-resident index is not available.
