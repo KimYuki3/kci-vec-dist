@@ -230,8 +230,11 @@ The method that maps Euclidean distance onto the cosine index is patent pending
 
 ## License
 
+[PolyForm Noncommercial 1.0.0](LICENSE) — the same license as the source ([kci-vec-src](https://github.com/KimYuki3/kci-vec-src)).
 Free for research, educational, personal and other non-commercial use; commercial use requires a separate license.
-See [LICENSE](LICENSE). © 2026 Yukihiro Kimura.
+(Until 2026-11-13 this repository had its own non-commercial license with the same intent.)
+
+Required Notice: Copyright 2026 Yukihiro Kimura (https://github.com/KimYuki3)
 
 **Contact** — questions, bug reports and commercial licensing: open an issue in this repository
 ([KimYuki3/kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues)). Issues are public; for a commercial inquiry,

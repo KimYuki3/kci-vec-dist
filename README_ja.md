@@ -220,8 +220,11 @@ for doc_id, dist2 in v.search(query, k=10):   # 距離の 2 乗 |q - x|^2、小�
 
 ## ライセンス
 
+[PolyForm Noncommercial 1.0.0](LICENSE)。ソース ([kci-vec-src](https://github.com/KimYuki3/kci-vec-src)) と同じライセンスです。
 研究・教育・個人・その他の非商用の利用は無償です。商用の利用には別の契約が必要です。
-詳しくは [LICENSE](LICENSE) をご覧ください。© 2026 Yukihiro Kimura。
+(2026-11-13 までは、同じ趣旨の自作の非商用ライセンスでした。)
+
+Required Notice: Copyright 2026 Yukihiro Kimura (https://github.com/KimYuki3)
 
 **連絡先** — 質問・不具合の報告・商用の契約のご相談は、このリポジトリの Issue へどうぞ
 ([KimYuki3/kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues))。Issue は公開されます。商用のご相談は一言だけ書いていただければ、
