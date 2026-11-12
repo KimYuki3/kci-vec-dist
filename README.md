@@ -26,6 +26,22 @@ industries, single-tenant services — and anyone who would rather not run a vec
 
 ---
 
+## What you can use it for
+
+| Use | Example | What makes it fit |
+|---|---|---|
+| **Search and RAG over documents that must stay in-house** | Find internal rules, manuals or support history by meaning before an AI answers from them | Nothing is sent to an outside service. The index on disk is encrypted, and tampering is detected |
+| **Search inside an application** | Search notes, mail or files by meaning in a desktop or on-device app | No server; it runs in your process. About a quarter of float32's memory |
+| **One index per customer** | In a service, give each customer their own index file and key | An index is one file, encrypted per key. A wrong key is refused |
+| **Search that respects permissions** | Show only the documents a department or role may see | Filtering by a condition on the id |
+| **Search that also needs exact words** | Queries with part numbers, names or figures that meaning alone misses | Keyword and vector ranking combined |
+| **Comparing methods, research** | Measure speed against other libraries on the same harness | The wheel installs with pip, without the sources; an ANN-Benchmarks component is proposed in [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) |
+
+What the evaluation build does not cover (platforms, update model, license) is listed under
+*Limitations of the evaluation build* and *License* below.
+
+---
+
 ## Speed
 
 glove-100-angular (1.18 M × 100), official ANN-Benchmarks harness: k = 10, one CPU core, 10,000 queries, best of 5 runs
