@@ -7,6 +7,8 @@ One in-process library — no server, no dependencies — from a laptop to a Xeo
 
 This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity and Euclidean (L2) distance.
 
+**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.1](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.1)). Install it with the `pip install` line under *Install* below.
+
 ---
 
 ## At a glance

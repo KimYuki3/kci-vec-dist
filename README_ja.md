@@ -7,6 +7,8 @@
 
 このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度とユークリッド (L2) 距離に対応しています。
 
+**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.1](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.1))。入れ方は下の「入れ方」の `pip install` の 1 行です。
+
 ---
 
 ## ひと目で
