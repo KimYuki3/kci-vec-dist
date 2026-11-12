@@ -1,7 +1,7 @@
 # KCI-Vec
 
-**Embedded vector search, encrypted at rest.**
-One in-process library — no server, no dependencies — from a laptop to a Xeon.
+**Fast, compact vector search you embed in your application.**
+One in-process library — no server, no dependencies — from a laptop to a Xeon. Saved indexes can be encrypted when you need it.
 
 *[日本語](README_ja.md)* · **Overview page:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A>
 
@@ -16,13 +16,14 @@ This repository hosts the **evaluation build**: a Python wheel for Linux x86-64,
 | | |
 |---|---|
 | **Embedded** | Runs inside your process. No server, no JVM, nothing to operate |
-| **Encrypted at rest** | Saved indexes are encrypted (AES-256-CTR) and authenticated (AES-256-CMAC). Wrong keys and tampered files are refused. Search runs at full speed |
-| **Compact** | One byte per dimension — about a quarter of float32 |
 | **Fast** | On the official ANN-Benchmarks harness, roughly 2–5× ScaNN 1.4.2, and on par with or ahead of qsgngt on the same machines |
-| **Updatable** | Insert, delete and compact after the build. Metadata filtering. Hybrid keyword + vector ranking |
+| **Compact** | One byte per dimension — about a quarter of float32 |
+| **Updatable** | Insert, delete and compact after the build |
+| **Flexible queries** | Metadata / permission filtering, hybrid keyword + vector ranking |
+| **Encryption if you need it** | Saved indexes can be encrypted (AES-256-CTR) and authenticated (AES-256-CMAC). Optional; costs nothing when unused |
 
-Built for search over data that must not leave the machine: on-device and desktop apps, in-house systems in regulated
-industries, single-tenant services — and anyone who would rather not run a vector database just to search.
+Made for applications that need vector search without running a vector database: shipped inside an app, on a device,
+or over data that should not leave the machine.
 
 ---
 
@@ -30,15 +31,47 @@ industries, single-tenant services — and anyone who would rather not run a vec
 
 | Use | Example | What makes it fit |
 |---|---|---|
-| **Search and RAG over documents that must stay in-house** | Find internal rules, manuals or support history by meaning before an AI answers from them | Nothing is sent to an outside service. The index on disk is encrypted, and tampering is detected |
 | **Search inside an application** | Search notes, mail or files by meaning in a desktop or on-device app | No server; it runs in your process. About a quarter of float32's memory |
-| **One index per customer** | In a service, give each customer their own index file and key | An index is one file, encrypted per key. A wrong key is refused |
-| **Search that respects permissions** | Show only the documents a department or role may see | Filtering by a condition on the id |
 | **Search that also needs exact words** | Queries with part numbers, names or figures that meaning alone misses | Keyword and vector ranking combined |
+| **Search that respects permissions** | Show only the documents a department or role may see | Filtering by a condition on the id |
+| **Search and RAG over in-house documents** | Find internal rules, manuals or support history by meaning before an AI answers from them | Nothing has to go to an outside service. The index can be encrypted, with tampering detected |
+| **One index per customer** | In a service, give each customer their own index file | An index is one file; if needed, each customer's can be encrypted with its own key |
 | **Comparing methods, research** | Measure speed against other libraries on the same harness | The wheel installs with pip, without the sources; an ANN-Benchmarks component is proposed in [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) |
 
 What the evaluation build does not cover (platforms, update model, license) is listed under
 *Limitations of the evaluation build* and *License* below.
+
+---
+
+## Compared with other products
+
+All figures are the author's own measurements and have not been independently verified. Conditions are under *Speed* below.
+
+**Compared with vector databases that run as a server**
+- **Nothing to operate**: a search is a function call inside your process. No server to start, monitor, upgrade or network.
+- **Ships with your application**: one wheel (one library inside), one file per index.
+- **No network round trip** per query (a difference in design; not measured here).
+
+**Compared with embedded libraries (ScaNN, hnswlib, …)**
+- **Faster**: on the same machines with the same official harness, 2.2–5.3× ScaNN 1.4.2 (partitioned index) and
+  8.7–13.8× hnswlib 0.8.0 (graph index; 9950X, hnswlib with a reduced grid) on glove-100 (cosine); 2.2–2.4× ScaNN and
+  2.6–3.1× hnswlib on sift-128 (L2, partitioned index).
+- **Smaller**: one byte per dimension (int8), about a quarter of an index held in float32.
+- **All in one**: insert / delete / compact after the build, metadata filtering, keyword (BM25) + vector ranking, and
+  encrypted, authenticated saves — without combining separate components.
+
+**Compared with other quantized-graph methods (qsgngt, glass, SymphonyQG, NGT-QG)**
+- **glove-100**: against qsgngt, 1–7 % behind at recall 0.90 and 0.95 and 1.16–1.30× at 0.99 on the Xeon; 1.34–1.55× on the 9950X.
+- **VIBE, the embedding benchmark (yahoo-minilm-384, k = 100)**: 1.09–1.36× glass, 1.3–1.6× SymphonyQG, 1.4–2.0× NGT-QG
+  (Xeon and 9950X; the others measured a day or two before on the same machines).
+- **Faster to build**: on one core, about a seventh of qsgngt's build time on glove-100 (1,867 s vs 13,051 s, partitioned
+  index, Xeon), and under a quarter of NGT-QG's on VIBE yahoo (249–458 s vs 1,894–3,884 s,
+  graph index, Xeon, best-point indexes on both sides).
+
+**Where it is weaker**
+- The graph index (compact layout) is large: 3.3–4.3× glass's memory on VIBE yahoo (best-point indexes).
+- On 1024-dimensional L2 data (VIBE agnews), it does not reach glass from recall 0.95 up.
+- The evaluation build is Linux x86-64 only.
 
 ---
 
@@ -81,6 +114,29 @@ recall@10 ≥ 0.90 / 0.95 / 0.99.
 - The graph's 0.99 figure comes from settings added after the first run (which stopped at recall 0.98).
 - qsgngt is not listed: its binary distribution did not produce results on this dataset in our environment.
 - sift-128 vectors have similar lengths; data with widely differing lengths needs more work for the same recall (see Limitations).
+
+### Speed on VIBE, the embedding benchmark
+
+[VIBE](https://github.com/vector-index-bench/vibe), official container flow, yahoo-minilm-384-normalized (677 k × 384,
+cosine): k = 100, one core for build and search, best of 5 runs per setting. Best QPS at recall@100 ≥ 0.90 / 0.95 / 0.99.
+KCI-Vec is wheel 0.2.1.
+
+| algorithm | Intel Xeon 8375C (AWS r6id.4xlarge) | AMD Ryzen 9 9950X |
+|---|---|---|
+| **KCI-Vec — graph** (compact layout, preview) | **9,669 / 7,934 / 5,336** | **19,267 / 16,074 / 10,900** |
+| **KCI-Vec — partitioned** | 7,383 / 6,287 / 2,969 | 18,126 / 13,642 / 5,802 |
+| glass | 8,844 / 6,575 / 4,854 | 15,010 / 11,811 / 8,861 |
+| SymphonyQG | 7,066 / 6,001 / 3,789 | 12,476 / 10,527 / 6,784 |
+| NGT-QG | 6,887 / 4,916 / 3,266 | 11,497 / 8,256 / 5,339 |
+| LoRANN | 6,417 / 3,398 / 1,297 | 16,991 / 8,690 / 3,024 |
+| ScaNN | 3,203 / 2,057 / 645 | 10,456 / 6,755 / 2,459 |
+
+- One run each, the author's own measurements. The others ran with VIBE's own grids, on the same machines a day or two
+  before KCI-Vec.
+- **KCI-Vec's grid was widened after looking at results on this dataset** (two dims per code, int8 re-scoring, ef 220 / 250).
+- On 1024-dimensional L2 data (agnews-mxbai-1024-euclidean, 9950X, same day) glass is faster from recall 0.95 up:
+  KCI-Vec graph 9,653 / 6,328 / 3,470, glass 9,875 / 7,425 / 4,693.
+- Not yet submitted to VIBE. Not compared with the figures on vector-index-bench.github.io (another time, other machines).
 
 ---
 
