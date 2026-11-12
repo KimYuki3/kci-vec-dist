@@ -77,13 +77,13 @@ recall@10 が 0.90 / 0.95 / 0.99 以上になる設定のうち、いちばん�
 ## 入れ方
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.0/kci_vec-0.2.0-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.1/kci_vec-0.2.1-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 必要なもの: Linux x86-64 (glibc 2.35 以降。例えば Ubuntu 22.04 以降、Debian 12 以降)、AVX2 のある CPU (AVX-512 があれば使います)、
 Python 3.8 以降、NumPy。
 
-wheel の sha256: `410169d09406bc48b43f8186e0ef81fb737b7168340977cd78e8047e1eace508`
+wheel の sha256: `a52a20af54e99e3a6d4217e38db1b24155e8072e7582432538b17927c3922f33`
 
 ---
 
