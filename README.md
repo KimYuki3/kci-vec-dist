@@ -9,6 +9,8 @@ This repository hosts the **evaluation build**: a Python wheel for Linux x86-64,
 
 **Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.1](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.1)). Install it with the `pip install` line under *Install* below.
 
+**Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (cosine indexes), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The L2 index is in the wheel only for now; its source will follow.
+
 ---
 
 ## At a glance
@@ -36,7 +38,7 @@ or over data that should not leave the machine.
 | **Search that respects permissions** | Show only the documents a department or role may see | Filtering by a condition on the id |
 | **Search and RAG over in-house documents** | Find internal rules, manuals or support history by meaning before an AI answers from them | Nothing has to go to an outside service. The index can be encrypted, with tampering detected |
 | **One index per customer** | In a service, give each customer their own index file | An index is one file; if needed, each customer's can be encrypted with its own key |
-| **Comparing methods, research** | Measure speed against other libraries on the same harness | The wheel installs with pip, without the sources; an ANN-Benchmarks component is proposed in [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) |
+| **Comparing methods, research** | Measure speed against other libraries on the same harness | The wheel installs with pip (the source is in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src)); an ANN-Benchmarks component is proposed in [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) |
 
 What the evaluation build does not cover (platforms, update model, license) is listed under
 *Limitations of the evaluation build* and *License* below.

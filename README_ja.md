@@ -9,6 +9,8 @@
 
 **ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.1](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.1))。入れ方は下の「入れ方」の `pip install` の 1 行です。
 
+**ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (cosine の索引)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。L2 の索引はいまは wheel だけにあり、ソースは後で公開します。
+
 ---
 
 ## ひと目で
@@ -36,7 +38,7 @@
 | **権限に合わせた検索** | 部署や役職で見てよい文書だけを結果に出す | id に対する条件での絞り込み |
 | **社内の文書の検索・RAG** | 社内規程や手順書、問い合わせの履歴を、AI に答えさせる前に意味で探す | 外部のサービスに送らずに済む。要るなら索引を暗号化し、改ざんを検出できる |
 | **利用者ごとに分けた索引** | サービスで、お客さまごとに索引のファイルを分ける | 索引は 1 つのファイル。要るなら、お客さまごとに別の鍵で暗号化できる |
-| **手法の比べ・研究** | ほかのライブラリと同じ手順で速さを比べる | wheel を pip で入れるだけで、ソースは要らない。ANN-Benchmarks の部品は [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) で申し込み中 |
+| **手法の比べ・研究** | ほかのライブラリと同じ手順で速さを比べる | wheel を pip で入れるだけで動く (ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src))。ANN-Benchmarks の部品は [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) で申し込み中 |
 
 評価用の部品で対応していないこと (動く環境、更新の仕方、ライセンス) は、下の「評価用の部品の制限」と「ライセンス」の節にあります。
 
