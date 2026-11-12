@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="400" viewBox="0 0 960 400" role="img" aria-label="VIBE, yahoo-minilm-384, Intel Xeon 8375C — time to build the index (1 core, shorter is better)" font-family="system-ui, -apple-system, &quot;Segoe UI&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, sans-serif">
+<rect width="960" height="400" rx="8" fill="#fcfcfb"/>
+<text x="24" y="34" font-size="15" font-weight="600" fill="#0b0b0b">VIBE, yahoo-minilm-384, Intel Xeon 8375C — time to build the index (1 core, shorter is better)</text>
+<text x="24" y="56" font-size="12" fill="#52514e">For each algorithm, the index behind its fastest setting at recall@100 ≥ 0.95</text>
+<line x1="190.0" x2="190.0" y1="88" y2="336" stroke="#c3c2b7" stroke-width="1"/>
+<text x="190.0" y="352" font-size="11" text-anchor="middle" fill="#898781" style="font-variant-numeric: tabular-nums">0</text>
+<line x1="362.5" x2="362.5" y1="88" y2="336" stroke="#e1e0d9" stroke-width="1"/>
+<text x="362.5" y="352" font-size="11" text-anchor="middle" fill="#898781" style="font-variant-numeric: tabular-nums">1,000</text>
+<line x1="535.0" x2="535.0" y1="88" y2="336" stroke="#e1e0d9" stroke-width="1"/>
+<text x="535.0" y="352" font-size="11" text-anchor="middle" fill="#898781" style="font-variant-numeric: tabular-nums">2,000</text>
+<line x1="707.5" x2="707.5" y1="88" y2="336" stroke="#e1e0d9" stroke-width="1"/>
+<text x="707.5" y="352" font-size="11" text-anchor="middle" fill="#898781" style="font-variant-numeric: tabular-nums">3,000</text>
+<line x1="880.0" x2="880.0" y1="88" y2="336" stroke="#e1e0d9" stroke-width="1"/>
+<text x="880.0" y="352" font-size="11" text-anchor="middle" fill="#898781" style="font-variant-numeric: tabular-nums">4,000</text>
+<text x="535.0" y="370" font-size="11" text-anchor="middle" fill="#898781">seconds</text>
+<text x="180" y="116.0" font-size="12.5" text-anchor="end" fill="#0b0b0b" font-weight="600">KCI-Vec graph</text>
+<path d="M190,102.0 L229.0,102.0 Q233.0,102.0 233.0,106.0 L233.0,116.0 Q233.0,120.0 229.0,120.0 L190,120.0 Z" fill="#2a78d6"><title>KCI-Vec graph: 249 s</title></path>
+<text x="239.0" y="116.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">249 s</text>
+<text x="180" y="146.0" font-size="12.5" text-anchor="end" fill="#52514e" font-weight="400">LoRANN</text>
+<path d="M190,132.0 L230.5,132.0 Q234.5,132.0 234.5,136.0 L234.5,146.0 Q234.5,150.0 230.5,150.0 L190,150.0 Z" fill="#b4b2a9"><title>LoRANN: 258 s</title></path>
+<text x="240.5" y="146.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">258 s</text>
+<text x="180" y="176.0" font-size="12.5" text-anchor="end" fill="#52514e" font-weight="400">ScaNN</text>
+<path d="M190,162.0 L240.0,162.0 Q244.0,162.0 244.0,166.0 L244.0,176.0 Q244.0,180.0 240.0,180.0 L190,180.0 Z" fill="#b4b2a9"><title>ScaNN: 313 s</title></path>
+<text x="250.0" y="176.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">313 s</text>
+<text x="180" y="206.0" font-size="12.5" text-anchor="end" fill="#0b0b0b" font-weight="600">KCI-Vec partitioned</text>
+<path d="M190,192.0 L249.1,192.0 Q253.1,192.0 253.1,196.0 L253.1,206.0 Q253.1,210.0 249.1,210.0 L190,210.0 Z" fill="#eb6834"><title>KCI-Vec partitioned: 366 s</title></path>
+<text x="259.1" y="206.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">366 s</text>
+<text x="180" y="236.0" font-size="12.5" text-anchor="end" fill="#52514e" font-weight="400">glass</text>
+<path d="M190,222.0 L254.0,222.0 Q258.0,222.0 258.0,226.0 L258.0,236.0 Q258.0,240.0 254.0,240.0 L190,240.0 Z" fill="#b4b2a9"><title>glass: 394 s</title></path>
+<text x="264.0" y="236.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">394 s</text>
+<text x="180" y="266.0" font-size="12.5" text-anchor="end" fill="#52514e" font-weight="400">SymphonyQG</text>
+<path d="M190,252.0 L261.6,252.0 Q265.6,252.0 265.6,256.0 L265.6,266.0 Q265.6,270.0 261.6,270.0 L190,270.0 Z" fill="#b4b2a9"><title>SymphonyQG: 438 s</title></path>
+<text x="271.6" y="266.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">438 s</text>
+<text x="180" y="296.0" font-size="12.5" text-anchor="end" fill="#52514e" font-weight="400">PAG</text>
+<path d="M190,282.0 L341.1,282.0 Q345.1,282.0 345.1,286.0 L345.1,296.0 Q345.1,300.0 341.1,300.0 L190,300.0 Z" fill="#b4b2a9"><title>PAG: 899 s</title></path>
+<text x="351.1" y="296.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">899 s</text>
+<text x="180" y="326.0" font-size="12.5" text-anchor="end" fill="#52514e" font-weight="400">NGT-QG</text>
+<path d="M190,312.0 L856.0,312.0 Q860.0,312.0 860.0,316.0 L860.0,326.0 Q860.0,330.0 856.0,330.0 L190,330.0 Z" fill="#b4b2a9"><title>NGT-QG: 3,884 s</title></path>
+<text x="866.0" y="326.0" font-size="11.5" fill="#52514e" style="font-variant-numeric: tabular-nums">3,884 s</text>
+<text x="24" y="384" font-size="11.5" fill="#898781">Author's own measurements, one run each, not independently verified.</text>
+</svg>

@@ -68,6 +68,11 @@ All figures are the author's own measurements and have not been independently ve
   index, Xeon), and under a quarter of NGT-QG's on VIBE yahoo (249–458 s vs 1,894–3,884 s,
   graph index, Xeon, best-point indexes on both sides).
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_build_en_dark.svg">
+  <img alt="One-core build time on VIBE yahoo-minilm-384, Intel Xeon 8375C, of the index behind each algorithm's fastest setting at recall@100 0.95: KCI-Vec graph 249 s, LoRANN 258 s, ScaNN 313 s, KCI-Vec partitioned 366 s, glass 394 s, SymphonyQG 438 s, PAG 899 s, NGT-QG 3,884 s." src="docs/img/vibe_build_en_light.svg" width="960">
+</picture>
+
 **Where it is weaker**
 - The graph index (compact layout) is large: 3.3–4.3× glass's memory on VIBE yahoo (best-point indexes).
 - On 1024-dimensional L2 data (VIBE agnews), it does not reach glass from recall 0.95 up.
@@ -120,6 +125,11 @@ recall@10 ≥ 0.90 / 0.95 / 0.99.
 [VIBE](https://github.com/vector-index-bench/vibe), official container flow, yahoo-minilm-384-normalized (677 k × 384,
 cosine): k = 100, one core for build and search, best of 5 runs per setting. Best QPS at recall@100 ≥ 0.90 / 0.95 / 0.99.
 KCI-Vec is wheel 0.2.1.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_qps_en_dark.svg">
+  <img alt="Best QPS at recall@100 0.90 / 0.95 / 0.99 on VIBE yahoo-minilm-384, Xeon 8375C and Ryzen 9 9950X: KCI-Vec graph, KCI-Vec partitioned, glass, SymphonyQG, NGT-QG. Values in the table below." src="docs/img/vibe_qps_en_light.svg" width="960">
+</picture>
 
 | algorithm | Intel Xeon 8375C (AWS r6id.4xlarge) | AMD Ryzen 9 9950X |
 |---|---|---|

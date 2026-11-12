@@ -64,6 +64,11 @@
 - **作るのが速い**: 1 コアで索引を作る時間は、glove-100 で qsgngt の約 7 分の 1 (1,867 秒 対 13,051 秒、区分け方式、Xeon)、
   VIBE の yahoo で NGT-QG の 4 分の 1 以下 (249〜458 秒 対 1,894〜3,884 秒、グラフ方式、Xeon、どちらも最良点の索引)。
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_build_ja_dark.svg">
+  <img alt="VIBE の yahoo-minilm-384、Intel Xeon 8375C で、recall@100 0.95 でいちばん速かった設定の索引を 1 コアで作る時間。KCI-Vec グラフ方式 249 秒、LoRANN 258 秒、ScaNN 313 秒、KCI-Vec 区分け方式 366 秒、glass 394 秒、SymphonyQG 438 秒、PAG 899 秒、NGT-QG 3,884 秒。" src="docs/img/vibe_build_ja_light.svg" width="960">
+</picture>
+
 **弱いところも書いておきます**
 - グラフ方式 (詰めた配置) の索引は大きく、VIBE の yahoo では最良点の索引どうしで glass の 3.3〜4.3 倍のメモリを使います。
 - 1024 次元の L2 のデータ (VIBE の agnews) では、recall 0.95 から上で glass に届いていません。
@@ -114,6 +119,11 @@ recall@10 が 0.90 / 0.95 / 0.99 以上になる設定のうち、いちばん�
 
 [VIBE](https://github.com/vector-index-bench/vibe) の公式のコンテナの流れで、yahoo-minilm-384-normalized (67.7 万件 × 384 次元、cosine)。
 k=100、索引作りも検索も 1 コア、各設定 5 回の最速。recall@100 が 0.90 / 0.95 / 0.99 以上での最良 QPS です。KCI-Vec は wheel 0.2.1 です。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_qps_ja_dark.svg">
+  <img alt="VIBE の yahoo-minilm-384 の recall@100 0.90 / 0.95 / 0.99 での最良 QPS。Xeon 8375C と Ryzen 9 9950X で、KCI-Vec グラフ方式・区分け方式・glass・SymphonyQG・NGT-QG を並べた棒グラフ。値は下の表。" src="docs/img/vibe_qps_ja_light.svg" width="960">
+</picture>
 
 | 算法 | Intel Xeon 8375C (AWS r6id.4xlarge) | AMD Ryzen 9 9950X |
 |---|---|---|
