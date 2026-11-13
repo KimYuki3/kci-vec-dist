@@ -152,6 +152,57 @@ KCI-Vec is wheel 0.2.1.
 
 ---
 
+## Why it is fast, and how it differs from the others
+
+**None of the building blocks is new.** HNSW graphs, 4-bit codes scored with table lookups ("fast scan"), ScaNN's
+anisotropic loss and NGT's ε search are all published. What KCI-Vec does differently is how it puts them together, in
+one C file with no dependencies, and the many small changes made wherever profiling showed time being lost. The gains
+quoted below are the author's own measurements (machine and number of runs given each time).
+
+### What is different from the others
+
+| | KCI-Vec | the others |
+|---|---|---|
+| **What it stores** | int8, one byte per dimension (about a quarter of float32). Distances are integer dot products (AVX2, AVX-512, NEON SDOT) | hnswlib keeps float32 vectors |
+| **One step in the graph** | Each node of the bottom layer holds **one block**: its neighbour ids and the neighbours' 4-bit codes, side by side. One read scores all neighbours with table lookups | hnswlib fetches each neighbour's vector from a different place in memory. SymphonyQG and NGT-QG also keep neighbours' codes with the node (the idea is theirs too); KCI-Vec uses 4-bit fast-scan codes in a fixed 32-slot layout |
+| **When to stop** | Keep the result set small (10–30) and continue only while a candidate is within (1 + ε) of the current bound | HNSW libraries usually grow the candidate list (ef). NGT's search-range coefficient ε is a similar idea |
+| **Partitioned index** | Close to ScaNN in design. The number of groups probed changes with each query (*probe gap*), and the candidate handling was rewritten after profiling | ScaNN probes a fixed number of groups |
+| **Form** | One C file; runs inside your application. Graph and partitioned indexes in the same library, with insert, delete, filters and encrypted saves | hnswlib, glass, NGT and ScaNN are C++ libraries, most used from Python |
+
+### The changes that made it fast
+
+1. **Read less memory.** int8 rows are a quarter of float32. A float copy (optional) re-ranks only the final
+   candidates and can stay in a memory-mapped file, so only the codes and the graph need to be in RAM.
+2. **Estimate first, compute exactly later.** For each query small lookup tables are built, and the CPU's byte-shuffle
+   instruction scores 32 (AVX2) or 64 (AVX-512) codes at a time. Only candidates whose estimate beats the current
+   bound are looked at further.
+3. **One block per hop** (quantized bottom layer, `kci_vec_build_qg`). Details that each gave a measurable gain:
+   - the bound test on 8 estimates at a time, producing a bit mask;
+   - a bucket queue instead of a heap for the candidates;
+   - reading ahead (prefetching) the block of the candidate most likely to be visited next: **+31–37 %**;
+   - since 0.2.1, a half-size block for the leftover slots. With M = 8 at 384 dimensions the block shrinks from
+     6,272 to 3,200 bytes, and QPS rose **1.28–1.58×** with identical results (Ryzen 7 5800H, three alternating rounds).
+4. **Stop early** (ε-radius, `kci_vec_searcher_set_eps`), together with reading ahead the "already visited" marks of all
+   neighbours (+7–8 %, three alternating rounds): **2.0–2.1×** the QPS of plain ef search on the same graph
+   (glove-100, Ryzen 9 9950X, one core, one run).
+5. **Partitioned index** (`kci_vec_build_ivf`): profiling showed the table lookups took only about a third of the scan
+   time, and cache misses on ids and heap traffic about as much again, so that part was rewritten. On
+   1024-dimensional data the codes cover only the top principal directions (*code dims*), which helped most there.
+
+### What was tried and did not help
+
+- Leaving pruned neighbour slots empty (as hnswlib does): 19–35 % less build time, but lower recall at every setting.
+- A three-stage coarse filter (4-bit, then int8, then float): about 0.6× the speed, because the random reads cost more
+  than they saved.
+- Low-rank estimates per group (in the style of LoRANN): −24 % on yahoo.
+
+### Where it is not ahead
+
+- Memory: the fastest graph settings take 3.3–4.3× glass's memory (VIBE yahoo, Xeon).
+- 1024-dimensional L2 data (VIBE agnews): glass is faster from recall 0.95 up.
+
+---
+
 ## Two index types
 
 - **Graph** — links each vector to its nearest neighbours and walks towards the query. Takes inserts and deletes; the
