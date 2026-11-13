@@ -230,6 +230,8 @@ v2 = KciVec.load("index.kv", key=b"a long secret")
 
 点数は cosine 類似度で、高い順に返ります。たくさんの質問をまとめて探すときは、`v.search_many(queries, k=10)` が `(ids, scores)` の配列を返します。
 
+**くわしい説明書**: すべての関数、速いグラフの使い方、始めるときの設定、守る決まりは [API_ja.md](https://github.com/KimYuki3/kci-vec-src/blob/main/docs/API_ja.md) にあります。
+
 ### ユークリッド (L2) 距離
 
 0.2.0 からの機能です。速さは上の「速さ」の節にあります。`metric="l2"` を渡します。ベクトルの長さはそのまま保たれます (正規化しません)。2 つの探し方、絞り込み、

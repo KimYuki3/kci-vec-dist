@@ -249,6 +249,9 @@ v2 = KciVec.load("index.kv", key=b"a long secret")
 Scores are cosine similarities, highest first. For many queries at once, `v.search_many(queries, k=10)` returns
 `(ids, scores)` arrays.
 
+**Full guide** — every function, the fast graph, settings to start from, and the rules to keep:
+[API.md](https://github.com/KimYuki3/kci-vec-src/blob/main/docs/API.md).
+
 ### Euclidean (L2) distance
 
 New in 0.2.0. Pass `metric="l2"`; the vectors keep their length (they are not normalized), and both index types,
