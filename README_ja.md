@@ -7,7 +7,7 @@
 
 このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度とユークリッド (L2) 距離に対応しています。
 
-**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.1](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.1))。入れ方は下の「入れ方」の `pip install` の 1 行です。
+**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.2](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2))。入れ方は下の「入れ方」の `pip install` の 1 行です。
 
 **ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (cosine の索引)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。L2 の索引はいまは wheel だけにあり、ソースは後で公開します。
 
@@ -198,7 +198,7 @@ KCI-Vec が違うのは組み合わせ方です。依存のない C の 1 ファ
 ## 入れ方
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.1/kci_vec-0.2.1-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.2/kci_vec-0.2.2-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 必要なもの: Linux x86-64 (glibc 2.35 以降。例えば Ubuntu 22.04 以降、Debian 12 以降)、AVX2 のある CPU (AVX-512 があれば使います)、
@@ -248,11 +248,30 @@ for doc_id, dist2 in v.search(query, k=10):   # 距離の 2 乗 |q - x|^2、小�
 
 ユークリッド距離を cosine の索引に写す方法は、特許出願中です (特願2026-241178)。この表示は、その方法だけについてのものです。
 
+### 内積
+
+0.2.2 からの機能です。`metric="ip"` を渡します。ベクトルの長さはそのまま保たれ、点数は `q·x` で、大きい順に返ります。2 つの探し方、絞り込み、
+暗号化した保存と読み込みは、cosine のときと同じように使えます。内積の検索を cosine の検索に直す、公表済みの方法 (Bachrach ほか、2014 年) を
+使っています。新しい方法ではありません。
+
+```python
+v = KciVec(dim=768, rerank=200, metric="ip")
+v.add_many(range(len(vectors)), vectors)
+v.build()                                  # 区分け方式なら v.build_lists()
+
+for doc_id, score in v.search(query, k=10):   # q·x、大きい順
+    ...
+```
+
+質問とデータの分布が違い、質問の見本とその正解が手元にあるとき向けに、0.2.2 には `learn(...)` / `search_learned(...)` と
+`vote_set(...)` / `search_voted(...)` もあります。見本から候補を取る方式で、知られている考え方 (RoarGraph や MLANN の系統) の実装です。
+新しい方法ではありません。くわしくは[配布の説明](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2)にあります。
+
 ---
 
 ## 評価用の部品の制限
 
-- Linux x86-64 のみです。cosine 類似度とユークリッド (L2) 距離に対応し、内積には対応していません。
+- Linux x86-64 のみです。cosine 類似度、ユークリッド (L2) 距離、内積に対応しています。
 - L2: ベクトルの長さが大きく違う (およそ 4 倍を超える) データでは、同じ再現率を出すのに、区分け方式の `nprobe` / `rerank_n` を
   cosine のときより大きくする必要があります。
 - グラフ方式の詰めた配置は先行版です。まだ保存できず、追加すると作り直すまで外れます。

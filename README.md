@@ -7,7 +7,7 @@ One in-process library — no server, no dependencies — from a laptop to a Xeo
 
 This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity and Euclidean (L2) distance.
 
-**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.1](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.1)). Install it with the `pip install` line under *Install* below.
+**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.2](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2)). Install it with the `pip install` line under *Install* below.
 
 **Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (cosine indexes), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The L2 index is in the wheel only for now; its source will follow.
 
@@ -216,7 +216,7 @@ Both support encrypted save / load, metadata filtering and float re-ranking.
 ## Install
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.1/kci_vec-0.2.1-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.2/kci_vec-0.2.2-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 Requirements: Linux x86-64 with glibc 2.35 or later (e.g. Ubuntu 22.04+, Debian 12+), a CPU with AVX2 (AVX-512 is
@@ -269,11 +269,31 @@ for doc_id, dist2 in v.search(query, k=10):   # squared distance |q - x|^2, smal
 The method that maps Euclidean distance onto the cosine index is patent pending
 (Japanese Patent Application No. 2026-241178). This notice covers that method only.
 
+### Inner product
+
+New in 0.2.2. Pass `metric="ip"`; the vectors keep their length and the score is `q·x`, largest first. Both index
+types, filtering and encrypted save / load work as for cosine. It uses the published reduction of inner-product
+search to cosine search (Bachrach et al., 2014); it is not a new method.
+
+```python
+v = KciVec(dim=768, rerank=200, metric="ip")
+v.add_many(range(len(vectors)), vectors)
+v.build()                                  # or v.build_lists()
+
+for doc_id, score in v.search(query, k=10):   # q·x, largest first
+    ...
+```
+
+When queries and data are distributed differently and a sample of queries with their true neighbours is available,
+0.2.2 also has `learn(...)` / `search_learned(...)` and `vote_set(...)` / `search_voted(...)`, which take their
+candidates from that sample. They implement known ideas (the family of RoarGraph and MLANN), not a new method; see
+the [release notes](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2).
+
 ---
 
 ## Limitations of the evaluation build
 
-- Linux x86-64 only. Cosine similarity and Euclidean (L2) distance; inner product is not supported.
+- Linux x86-64 only. Cosine similarity, Euclidean (L2) distance and inner product.
 - L2: when vector lengths differ widely (more than about 4×), the partitioned index needs a larger `nprobe` /
   `rerank_n` than a cosine index for the same recall.
 - The compact graph layout is a preview: it is not saved yet, and an insert drops it until it is rebuilt.
