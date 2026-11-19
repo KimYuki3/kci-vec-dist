@@ -5,11 +5,11 @@ One in-process library — no server, no dependencies — from a laptop to a Xeo
 
 *[日本語](README_ja.md)* · **Overview page:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A>
 
-This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity and Euclidean (L2) distance.
+This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity, Euclidean (L2) distance and inner product.
 
-**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.2](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2)). Install it with the `pip install` line under *Install* below.
+**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.3](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.3)). Install it with the `pip install` line under *Install* below.
 
-**Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (cosine indexes), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The L2 index is in the wheel only for now; its source will follow.
+**Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (all three metrics from 0.2.3), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The 0.2.3 wheel is built from that source.
 
 ---
 
@@ -77,7 +77,7 @@ All figures are the author's own measurements and have not been independently ve
 
 **Where it is weaker**
 - The graph index (compact layout) is large: 3.3–4.3× glass's memory on VIBE yahoo (best-point indexes).
-- On 1024-dimensional L2 data (VIBE agnews), it does not reach glass from recall 0.95 up.
+- On 1024-dimensional L2 data (VIBE agnews), versions up to 0.2.2 did not reach glass from recall 0.95 up. 0.2.3 does (see below), but its index takes about twice glass's memory.
 - The evaluation build is Linux x86-64 only.
 
 ---
@@ -146,8 +146,10 @@ KCI-Vec is wheel 0.2.1.
 - One run each, the author's own measurements. The others ran with VIBE's own grids, on the same machines a day or two
   before KCI-Vec.
 - **KCI-Vec's grid was widened after looking at results on this dataset** (two dims per code, int8 re-scoring, ef 220 / 250).
-- On 1024-dimensional L2 data (agnews-mxbai-1024-euclidean, 9950X, same day) glass is faster from recall 0.95 up:
-  KCI-Vec graph 9,653 / 6,328 / 3,470, glass 9,875 / 7,425 / 4,693.
+- On 1024-dimensional L2 data (agnews-mxbai-1024-euclidean, 9950X) glass was faster than 0.2.1 from recall 0.95 up
+  (KCI-Vec graph 9,653 / 6,328 / 3,470, glass 9,875 / 7,425 / 4,693). Measured again with 0.2.3 on one night:
+  KCI-Vec 12,464 / 9,631 / 5,912, glass 9,877 / 7,378 / 4,961 (2026-11-19, one run; the KCI-Vec settings were chosen by us).
+  Index memory: KCI-Vec 5.0-7.4 GB, glass 2.5-3.6 GB.
 - Not yet submitted to VIBE. Not compared with the figures on vector-index-bench.github.io (another time, other machines).
 
 ---
@@ -161,7 +163,7 @@ ScaNN's anisotropic loss, NGT's ε search).
 ### Where it is not ahead
 
 - Memory: the fastest graph settings take 3.3–4.3× glass's memory (VIBE yahoo, Xeon).
-- 1024-dimensional L2 data (VIBE agnews): glass is faster from recall 0.95 up.
+- 1024-dimensional L2 data (VIBE agnews): the index takes about twice glass's memory (5.0-7.4 GB against 2.5-3.6 GB).
 
 ---
 
@@ -178,13 +180,13 @@ Both support encrypted save / load, metadata filtering and float re-ranking.
 ## Install
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.2/kci_vec-0.2.2-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.3/kci_vec-0.2.3-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 Requirements: Linux x86-64 with glibc 2.35 or later (e.g. Ubuntu 22.04+, Debian 12+), a CPU with AVX2 (AVX-512 is
 used when present), Python 3.8+, NumPy.
 
-sha256 of the wheel: `a52a20af54e99e3a6d4217e38db1b24155e8072e7582432538b17927c3922f33`
+sha256 of the wheel: `6a58c5ddf3c2c3659177f86a7f00153b319dbf004928f2205273cfcdaba4b8f2`
 
 ---
 

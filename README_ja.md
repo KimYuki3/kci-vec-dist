@@ -5,11 +5,11 @@
 
 *[English](README.md)* · **紹介ページ:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A#ja>
 
-このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度とユークリッド (L2) 距離に対応しています。
+このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度、ユークリッド (L2) 距離、内積に対応しています。
 
-**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.2](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2))。入れ方は下の「入れ方」の `pip install` の 1 行です。
+**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.3](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.3))。入れ方は下の「入れ方」の `pip install` の 1 行です。
 
-**ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (cosine の索引)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。L2 の索引はいまは wheel だけにあり、ソースは後で公開します。
+**ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (0.2.3 から 3 つの距離すべて)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。0.2.3 の wheel はこのソースから作っています。
 
 ---
 
@@ -73,7 +73,7 @@
 
 **弱いところも書いておきます**
 - グラフ方式 (詰めた配置) の索引は大きく、VIBE の yahoo では最良点の索引どうしで glass の 3.3〜4.3 倍のメモリを使います。
-- 1024 次元の L2 のデータ (VIBE の agnews) では、recall 0.95 から上で glass に届いていません。
+- 1024 次元の L2 のデータ (VIBE の agnews) では、0.2.2 までは recall 0.95 から上で glass に届いていませんでした。0.2.3 では上回りましたが (下の節)、索引のメモリは glass の約 2 倍です。
 - 評価用の部品は Linux x86-64 だけです。
 
 ---
@@ -139,8 +139,10 @@ k=100、索引作りも検索も 1 コア、各設定 5 回の最速。recall@10
 
 - どれも 1 回ずつの、開発者自身の計測です。相手は VIBE 公式の設定の組そのままで、KCI-Vec の 1〜2 日前に同じ機械で測りました。
 - **KCI-Vec の設定の組は、このデータの結果を見ながら足したものです** (2 次元 1 符号、int8 での並べ直し、ef 220・250 など)。
-- 1024 次元の L2 のデータ (agnews-mxbai-1024-euclidean、9950X、同じ日) では、recall 0.95 から上で glass が速いです:
-  KCI-Vec グラフ方式 9,653 / 6,328 / 3,470、glass 9,875 / 7,425 / 4,693。
+- 1024 次元の L2 のデータ (agnews-mxbai-1024-euclidean、9950X) は、0.2.1 では recall 0.95 から上で glass が速いデータでした
+  (KCI-Vec グラフ方式 9,653 / 6,328 / 3,470、glass 9,875 / 7,425 / 4,693)。0.2.3 で同じ夜に測り直すと
+  KCI-Vec 12,464 / 9,631 / 5,912、glass 9,877 / 7,378 / 4,961 でした (2026-11-19、1 回の計測。KCI-Vec の設定の組はこちらで選んだもの)。
+  索引のメモリは KCI-Vec 5.0〜7.4 GB、glass 2.5〜3.6 GB です。
 - VIBE にはまだ登録していません。公開サイト (vector-index-bench.github.io) の数字とは比べていません (時期も機械も違うため)。
 
 ---
@@ -153,7 +155,7 @@ k=100、索引作りも検索も 1 コア、各設定 5 回の最速。recall@10
 ### 勝っていないところ
 
 - メモリ: いちばん速いグラフの設定は、glass の 3.3〜4.3 倍のメモリを使います (VIBE yahoo、Xeon)。
-- 1024 次元の L2 データ (VIBE agnews): recall 0.95 から上は glass のほうが速いです。
+- 1024 次元の L2 データ (VIBE agnews): 索引のメモリは glass の約 2 倍です (5.0〜7.4 GB 対 2.5〜3.6 GB)。
 
 ---
 
@@ -169,13 +171,13 @@ k=100、索引作りも検索も 1 コア、各設定 5 回の最速。recall@10
 ## 入れ方
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.2/kci_vec-0.2.2-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.3/kci_vec-0.2.3-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 必要なもの: Linux x86-64 (glibc 2.35 以降。例えば Ubuntu 22.04 以降、Debian 12 以降)、AVX2 のある CPU (AVX-512 があれば使います)、
 Python 3.8 以降、NumPy。
 
-wheel の sha256: `a52a20af54e99e3a6d4217e38db1b24155e8072e7582432538b17927c3922f33`
+wheel の sha256: `6a58c5ddf3c2c3659177f86a7f00153b319dbf004928f2205273cfcdaba4b8f2`
 
 ---
 
