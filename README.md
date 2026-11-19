@@ -7,7 +7,7 @@ One in-process library — no server, no dependencies — from a laptop to a Xeo
 
 This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity, Euclidean (L2) distance and inner product.
 
-**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.4](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.4)). Install it with the `pip install` line under *Install* below.
+**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.5](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.5)). Install it with the `pip install` line under *Install* below.
 
 **Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (all three metrics from 0.2.3), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The wheel is built from that source.
 
@@ -180,13 +180,13 @@ Both support encrypted save / load, metadata filtering and float re-ranking.
 ## Install
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.4/kci_vec-0.2.4-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.5/kci_vec-0.2.5-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 Requirements: Linux x86-64 with glibc 2.35 or later (e.g. Ubuntu 22.04+, Debian 12+), a CPU with AVX2 (AVX-512 is
 used when present), Python 3.8+, NumPy.
 
-sha256 of the wheel: `cf6142389609946557424c492f4d8d17f2effc0ee50cd4b8762964e7c5189f72`
+sha256 of the wheel: `033f7f1d68684b4c4fa7336e71821d1186cef2a9902b26c03a43c8fb41dd2a08`
 
 ---
 
