@@ -7,9 +7,9 @@ One in-process library — no server, no dependencies — from a laptop to a Xeo
 
 This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity, Euclidean (L2) distance and inner product.
 
-**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.8](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.8)). Install it with the `pip install` line under *Install* below.
+**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.9](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.9)). Install it with the `pip install` line under *Install* below.
 
-**Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (all three metrics from 0.2.3), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The wheel is built from that source. From 0.2.6 it also carries an experimental sparse index and hybrid ranking (`kci_vec.sparse`, `kci_vec.hybrid`); what it does, its limits and where it has been checked are in the source repository's README. From 0.2.8 the source also holds a PostgreSQL extension (a prototype, `pg/`; not in the wheel).
+**Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (all three metrics from 0.2.3), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The wheel is built from that source. From 0.2.6 it also carries an experimental sparse index and hybrid ranking (`kci_vec.sparse`, `kci_vec.hybrid`); what it does, its limits and where it has been checked are in the source repository's README. From 0.2.9 it also carries `kci_vec.text` (experimental): search by handing over texts; it needs torch and transformers, which you install yourself. From 0.2.8 the source also holds a PostgreSQL extension (a prototype, `pg/`; not in the wheel).
 
 ---
 
@@ -184,13 +184,13 @@ Both support encrypted save / load, metadata filtering and float re-ranking.
 ## Install
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.8/kci_vec-0.2.8-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.9/kci_vec-0.2.9-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 Requirements: Linux x86-64 with glibc 2.35 or later (e.g. Ubuntu 22.04+, Debian 12+), a CPU with AVX2 (AVX-512 is
 used when present), Python 3.8+, NumPy.
 
-sha256 of the wheel: `6b5c56a2e5b9213bf2ca0a907f32bbcedbd22914a848f34d98a2b450f5f7e939`
+sha256 of the wheel: `24799be9bca42f2bfef850dcd1ce81c1b5cfbb45dcfe9d5d9d0fc46861d874fa`
 
 ---
 
