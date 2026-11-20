@@ -7,9 +7,9 @@
 
 このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度、ユークリッド (L2) 距離、内積に対応しています。
 
-**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.5](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.5))。入れ方は下の「入れ方」の `pip install` の 1 行です。
+**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.6](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.6))。入れ方は下の「入れ方」の `pip install` の 1 行です。
 
-**ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (0.2.3 から 3 つの距離すべて)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。wheel はこのソースから作っています。
+**ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (0.2.3 から 3 つの距離すべて)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。wheel はこのソースから作っています。0.2.6 からは、実験的なスパースの索引とハイブリッドの合わせ方 (`kci_vec.sparse`、`kci_vec.hybrid`) も入っています。できること・制限・確かめた環境は、ソースのリポジトリの README にあります。
 
 ---
 
@@ -171,13 +171,13 @@ k=100、索引作りも検索も 1 コア、各設定 5 回の最速。recall@10
 ## 入れ方
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.5/kci_vec-0.2.5-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.6/kci_vec-0.2.6-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 必要なもの: Linux x86-64 (glibc 2.35 以降。例えば Ubuntu 22.04 以降、Debian 12 以降)、AVX2 のある CPU (AVX-512 があれば使います)、
 Python 3.8 以降、NumPy。
 
-wheel の sha256: `033f7f1d68684b4c4fa7336e71821d1186cef2a9902b26c03a43c8fb41dd2a08`
+wheel の sha256: `ef3e76456b3487ec84b211b155d1fa436c427ff06a497d8c2e77ddfeea0224cc`
 
 ---
 
