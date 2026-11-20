@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" width="760" height="380" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">
+<rect width="760" height="380" fill="#ffffff"/>
+<text x="64" y="22" font-size="14" font-weight="700" fill="#111">agnews (769 k × 1024 dims, L2) on a Ryzen 9 9950X: best QPS at recall@100 ≥ threshold</text>
+<rect x="64" y="38" width="12" height="12" rx="2" fill="#008f9b"/><text x="81" y="48.5" fill="#333">KCI-Vec 0.2.3 contents (quantized graph)</text>
+<rect x="363.0" y="38" width="12" height="12" rx="2" fill="#7b61c9"/><text x="380.0" y="48.5" fill="#333">glass</text>
+<rect x="438.0" y="38" width="12" height="12" rx="2" fill="#c2701f"/><text x="455.0" y="48.5" fill="#333">KCI-Vec 0.2.2 wheel (another day)</text>
+<line x1="64" x2="744" y1="300.0" y2="300.0" stroke="#9aa0a4"/>
+<text x="58" y="304.0" text-anchor="end" fill="#555">0</text>
+<line x1="64" x2="744" y1="268.3" y2="268.3" stroke="#e3e6e8"/>
+<text x="58" y="272.3" text-anchor="end" fill="#555">2,000</text>
+<line x1="64" x2="744" y1="236.6" y2="236.6" stroke="#e3e6e8"/>
+<text x="58" y="240.6" text-anchor="end" fill="#555">4,000</text>
+<line x1="64" x2="744" y1="204.9" y2="204.9" stroke="#e3e6e8"/>
+<text x="58" y="208.9" text-anchor="end" fill="#555">6,000</text>
+<line x1="64" x2="744" y1="173.1" y2="173.1" stroke="#e3e6e8"/>
+<text x="58" y="177.1" text-anchor="end" fill="#555">8,000</text>
+<line x1="64" x2="744" y1="141.4" y2="141.4" stroke="#e3e6e8"/>
+<text x="58" y="145.4" text-anchor="end" fill="#555">10,000</text>
+<line x1="64" x2="744" y1="109.7" y2="109.7" stroke="#e3e6e8"/>
+<text x="58" y="113.7" text-anchor="end" fill="#555">12,000</text>
+<line x1="64" x2="744" y1="78.0" y2="78.0" stroke="#e3e6e8"/>
+<text x="58" y="82.0" text-anchor="end" fill="#555">14,000</text>
+<text x="16" y="189" fill="#555" text-anchor="middle" transform="rotate(-90 16 189)">queries per second (1 core)</text>
+<path d="M88.3,300 V106.4 Q88.3,102.4 92.3,102.4 H142.3 Q146.3,102.4 146.3,106.4 V300 Z" fill="#008f9b"><title>KCI-Vec 0.2.3 contents (quantized graph), recall@100 ≥ 0.90: 12,464 QPS</title></path>
+<text x="117.3" y="97.4" text-anchor="middle" fill="#222" font-size="11">12,464</text>
+<path d="M148.3,300 V147.4 Q148.3,143.4 152.3,143.4 H202.3 Q206.3,143.4 206.3,147.4 V300 Z" fill="#7b61c9"><title>glass, recall@100 ≥ 0.90: 9,877 QPS</title></path>
+<text x="177.3" y="138.4" text-anchor="middle" fill="#222" font-size="11">9,877</text>
+<path d="M208.3,300 V146.8 Q208.3,142.8 212.3,142.8 H262.3 Q266.3,142.8 266.3,146.8 V300 Z" fill="#c2701f"><title>KCI-Vec 0.2.2 wheel (another day), recall@100 ≥ 0.90: 9,911 QPS</title></path>
+<text x="237.3" y="137.8" text-anchor="middle" fill="#222" font-size="11">9,911</text>
+<text x="177.3" y="318" text-anchor="middle" fill="#333" font-size="12.5">recall@100 ≥ 0.90</text>
+<text x="177.3" y="335" text-anchor="middle" fill="#555" font-size="11">KCI-Vec 0.2.3 / glass = 1.26</text>
+<path d="M315.0,300 V151.3 Q315.0,147.3 319.0,147.3 H369.0 Q373.0,147.3 373.0,151.3 V300 Z" fill="#008f9b"><title>KCI-Vec 0.2.3 contents (quantized graph), ≥ 0.95: 9,631 QPS</title></path>
+<text x="344.0" y="142.3" text-anchor="middle" fill="#222" font-size="11">9,631</text>
+<path d="M375.0,300 V187.0 Q375.0,183.0 379.0,183.0 H429.0 Q433.0,183.0 433.0,187.0 V300 Z" fill="#7b61c9"><title>glass, ≥ 0.95: 7,378 QPS</title></path>
+<text x="404.0" y="178.0" text-anchor="middle" fill="#222" font-size="11">7,378</text>
+<path d="M435.0,300 V197.9 Q435.0,193.9 439.0,193.9 H489.0 Q493.0,193.9 493.0,197.9 V300 Z" fill="#c2701f"><title>KCI-Vec 0.2.2 wheel (another day), ≥ 0.95: 6,693 QPS</title></path>
+<text x="464.0" y="188.9" text-anchor="middle" fill="#222" font-size="11">6,693</text>
+<text x="404.0" y="318" text-anchor="middle" fill="#333" font-size="12.5">≥ 0.95</text>
+<text x="404.0" y="335" text-anchor="middle" fill="#555" font-size="11">KCI-Vec 0.2.3 / glass = 1.31</text>
+<path d="M541.7,300 V210.3 Q541.7,206.3 545.7,206.3 H595.7 Q599.7,206.3 599.7,210.3 V300 Z" fill="#008f9b"><title>KCI-Vec 0.2.3 contents (quantized graph), ≥ 0.99: 5,912 QPS</title></path>
+<text x="570.7" y="201.3" text-anchor="middle" fill="#222" font-size="11">5,912</text>
+<path d="M601.7,300 V225.3 Q601.7,221.3 605.7,221.3 H655.7 Q659.7,221.3 659.7,225.3 V300 Z" fill="#7b61c9"><title>glass, ≥ 0.99: 4,961 QPS</title></path>
+<text x="630.7" y="216.3" text-anchor="middle" fill="#222" font-size="11">4,961</text>
+<path d="M661.7,300 V248.4 Q661.7,244.4 665.7,244.4 H715.7 Q719.7,244.4 719.7,248.4 V300 Z" fill="#c2701f"><title>KCI-Vec 0.2.2 wheel (another day), ≥ 0.99: 3,506 QPS</title></path>
+<text x="690.7" y="239.4" text-anchor="middle" fill="#222" font-size="11">3,506</text>
+<text x="630.7" y="318" text-anchor="middle" fill="#333" font-size="12.5">≥ 0.99</text>
+<text x="630.7" y="335" text-anchor="middle" fill="#555" font-size="11">KCI-Vec 0.2.3 / glass = 1.19</text>
+<text x="64" y="358" fill="#666" font-size="10.5">VIBE container flow, k = 100, one core. KCI-Vec 0.2.3 contents and glass measured one after the other on the night of 2026-11-19, same machine;</text>
+<text x="64" y="372" fill="#666" font-size="10.5">KCI-Vec's grid chosen by the author, glass on VIBE's own grid. Author's own measurement. bench/results_vibe_agnews_glass_9950x_20261119.txt</text>
+</svg>

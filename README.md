@@ -150,15 +150,19 @@ KCI-Vec is wheel 0.2.1.
   (KCI-Vec graph 9,653 / 6,328 / 3,470, glass 9,875 / 7,425 / 4,693). Measured again with 0.2.3 on one night:
   KCI-Vec 12,464 / 9,631 / 5,912, glass 9,877 / 7,378 / 4,961 (2026-11-19, one run; the KCI-Vec settings were chosen by us).
   Index memory: KCI-Vec 5.0-7.4 GB, glass 2.5-3.6 GB.
+
+  ![agnews (L2, 1024 dims) on the 9950X: KCI-Vec 0.2.3 contents, glass, KCI-Vec 0.2.2](docs/img/vibe_agnews_9950x_20261119.svg)
+
 - Not yet submitted to VIBE. Not compared with the figures on vector-index-bench.github.io (another time, other machines).
 
 ---
 
-## Why it is fast
+## Method
 
-Read less memory. Leave the exact computation for last. Stop early. KCI-Vec pushes these three as far as they go, in one
-C file with no dependencies. The foundations are published methods (HNSW graphs, 4-bit codes scored with table lookups,
-ScaNN's anisotropic loss, NGT's ε search).
+- It builds on published methods: HNSW, which walks a graph, and a partitioned index with 4-bit codes (the family ScaNN belongs to).
+- Vectors are kept in a compressed form, and only the best candidates are re-ordered at full precision at the end.
+- The speed comes less from doing fewer computations than from reading memory less often.
+- In exchange, the faster method needs a larger index.
 
 ### Where it is not ahead
 
