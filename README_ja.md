@@ -7,7 +7,7 @@
 
 このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度、ユークリッド (L2) 距離、内積に対応しています。
 
-**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.10](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.10))。入れ方は下の「入れ方」の `pip install` の 1 行です。
+**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.11](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.11))。入れ方は下の「入れ方」の `pip install` の 1 行です。
 
 **ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (0.2.3 から 3 つの距離すべて)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。wheel はこのソースから作っています。0.2.6 からは、実験的なスパースの索引とハイブリッドの合わせ方 (`kci_vec.sparse`、`kci_vec.hybrid`) も入っています。できること・制限・確かめた環境は、ソースのリポジトリの README にあります。 0.2.9 からは、文章を渡すだけで探せる `kci_vec.text` (実験的。torch と transformers は自分で入れます) も入っています。 0.2.8 からは、ソースに PostgreSQL の拡張 (試作、`pg/`。wheel には入っていません) もあります。
 
@@ -176,13 +176,13 @@ k=100、索引作りも検索も 1 コア、各設定 5 回の最速。recall@10
 ## 入れ方
 
 ```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.10/kci_vec-0.2.10-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.11/kci_vec-0.2.11-py3-none-manylinux_2_35_x86_64.whl
 ```
 
 必要なもの: Linux x86-64 (glibc 2.35 以降。例えば Ubuntu 22.04 以降、Debian 12 以降)、AVX2 のある CPU (AVX-512 があれば使います)、
 Python 3.8 以降、NumPy。
 
-wheel の sha256: `b8b7a836c2fca41d00860ae80f4ba191d599de8228b39ed5b948bf728a8d538f`
+wheel の sha256: `27526674e201bea0d663b265b58dee4984e056d5429eeb6a3497f492692b989e`
 
 ---
 
