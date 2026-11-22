@@ -110,7 +110,7 @@ The VIBE flow (a benchmark on data from current embedding models), k = 100, one 
 
 ```sh
 # Python (Linux x86-64): the distributed package
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.15/kci_vec-0.2.15-py3-none-manylinux_2_35_x86_64.whl
+pip install kci-vec
 
 # From source
 sh build_kci_vec.sh          # libkci_vec.{so|dylib} and example_kci_vec   (Linux / macOS)

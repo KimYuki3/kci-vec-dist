@@ -110,7 +110,7 @@ VIBE (いまの埋め込みモデルのデータでのベンチマーク) の流
 
 ```sh
 # Python (Linux x86-64): 配っている部品
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.15/kci_vec-0.2.15-py3-none-manylinux_2_35_x86_64.whl
+pip install kci-vec
 
 # ソースから
 sh build_kci_vec.sh          # libkci_vec.{so|dylib} と example_kci_vec   (Linux / macOS)
