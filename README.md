@@ -1,283 +1,196 @@
 # KCI-Vec
 
-**Fast, compact vector search you embed in your application.**
-One in-process library — no server, no dependencies — from a laptop to a Xeon. Saved indexes can be encrypted when you need it.
+A vector search library that runs inside your own app. It finds the closest matches by meaning among your documents
+or images. There is no search server to run, the data does not leave your machine, and the saved files can be encrypted.
 
-*[日本語](README_ja.md)* · **Overview page:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A>
+> This repository holds the evaluation package (a Python wheel for Linux x86-64). The wheel is attached to the [releases](https://github.com/KimYuki3/kci-vec-dist/releases) (latest: [v0.2.14](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.14), sha256 `fb224d0945729fbca004e6d592542718d15685f08ae4b10ad64d73655efd4067`). The source is in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src).
 
-This repository hosts the **evaluation build**: a Python wheel for Linux x86-64, for cosine similarity, Euclidean (L2) distance and inner product.
-
-**Download:** the wheel is attached to each release, not stored in the file list — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (latest: [v0.2.14](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.14)). Install it with the `pip install` line under *Install* below.
-
-**Source:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — the C source (all three metrics from 0.2.3), the Python client and the ANN-Benchmarks component, under PolyForm Noncommercial 1.0.0. The wheel is built from that source. From 0.2.6 it also carries an experimental sparse index and hybrid ranking (`kci_vec.sparse`, `kci_vec.hybrid`); what it does, its limits and where it has been checked are in the source repository's README. From 0.2.9 it also carries `kci_vec.text` (experimental): search by handing over texts; it needs torch and transformers, which you install yourself. From 0.2.8 the source also holds a PostgreSQL extension (a prototype, `pg/`; not in the wheel).
-
----
-
-## At a glance
+*[日本語](README_ja.md)*
 
 | | |
 |---|---|
-| **Embedded** | Runs inside your process. No server, no JVM, nothing to operate |
-| **Fast** | On the official ANN-Benchmarks harness, roughly 2–5× ScaNN 1.4.2, and on par with or ahead of qsgngt on the same machines |
-| **Compact** | One byte per dimension — about a quarter of float32 |
-| **Updatable** | Insert, delete and compact after the build |
-| **Flexible queries** | Metadata / permission filtering, hybrid keyword + vector ranking |
-| **Encryption if you need it** | Saved indexes can be encrypted (AES-256-CTR) and authenticated (AES-256-CMAC). Optional; costs nothing when unused |
+| Form | One C file (`kci_vec.c` + `kci_vec.h`), no dependencies. Callable from Python |
+| Where it fits | In-house systems, on-device software, search shipped inside a product: places where the data cannot go to an outside service |
+| Size it is meant for | Tens of thousands to a few million items. Vectors are kept at one byte per dimension, about a quarter of the memory of float |
+| Current version | 0.2.14 (2026-11-22). Changes per version: the [releases page](https://github.com/KimYuki3/kci-vec-dist/releases). The evaluation package (wheel) is in [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| Stage | Research stage. Every figure was measured by the developer; none has been confirmed by a third party yet |
 
-Made for applications that need vector search without running a vector database: shipped inside an app, on a device,
-or over data that should not leave the machine.
+## The first ten minutes: put texts in, ask a question
 
----
+No knowledge of vectors or models is needed to start. Hand over texts; they are turned into vectors and indexed inside.
 
-## What you can use it for
+```python
+from kci_vec.text import TextIndex
 
-| Use | Example | What makes it fit |
+ix = TextIndex("en", sparse="bm25")
+ix.add([
+    "Paid leave: 10 days are granted after six months of service. Apply three business days ahead.",
+    "Expense reports close at the end of the month. Hand the original receipts to general affairs.",
+    "If you forget your password, call the IT desk at extension 1234.",
+])
+for hit in ix.search("how many days of paid leave do I get?", k=2):
+    print(hit.id, round(hit.score, 3), hit.text)
+
+ix.save("my_index", key="your passphrase")   # the index and the texts, encrypted
+```
+
+The steps from installing to indexing your own files, saving, opening again and asking are in
+**[docs/quickstart_text.md](https://github.com/KimYuki3/kci-vec-src/blob/main/docs/quickstart_text.md)** (typed top to bottom in a fresh environment).
+This layer (`kci_vec.text`) is experimental and currently runs on Linux (on Windows: inside WSL2).
+
+Bringing your own vectors: see "Usage" below.
+
+## What it does
+
+| | In a line | Stage |
 |---|---|---|
-| **Search inside an application** | Search notes, mail or files by meaning in a desktop or on-device app | No server; it runs in your process. About a quarter of float32's memory |
-| **Search that also needs exact words** | Queries with part numbers, names or figures that meaning alone misses | Keyword and vector ranking combined |
-| **Search that respects permissions** | Show only the documents a department or role may see | Filtering by a condition on the id |
-| **Search and RAG over in-house documents** | Find internal rules, manuals or support history by meaning before an AI answers from them | Nothing has to go to an outside service. The index can be encrypted, with tampering detected |
-| **One index per customer** | In a service, give each customer their own index file | An index is one file; if needed, each customer's can be encrypted with its own key |
-| **Comparing methods, research** | Measure speed against other libraries on the same harness | The wheel installs with pip (the source is in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src)); an ANN-Benchmarks component is proposed in [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) |
+| Nearest vectors | Cosine, Euclidean (L2), inner product. Two structures: a graph that is walked, and partitions that are scanned | stable |
+| Insert, delete, compact after the build | Both structures | stable |
+| Filtered search | By attribute or permission, applied during the search (not cut afterwards) | stable |
+| Encrypted saves | AES-256-CTR; tampering detected with CMAC; a wrong key or a damaged file is refused | stable |
+| Search by handing over texts | `kci_vec.text`. Long texts are split automatically. Built-in default models for Japanese and English | experimental |
+| Together with word matching | Meaning plus words (BM25 or a sparse model), so part numbers, names and abbreviations are not lost | experimental |
+| A hook for your re-ranker | Take the candidates out and hand them to a re-ranking model of your own | experimental |
+| Identical vectors kept once | For data where the same text is stored many times (`kci_vec_set_dedup`) | stable |
+| From PostgreSQL | The extension in `pg/`, called through SQL functions | prototype |
+| One index shared by several processes | A read-only image opened with mmap | stable |
 
-What the evaluation build does not cover (platforms, update model, license) is listed under
-*Limitations of the evaluation build* and *License* below.
+The families: the graph is HNSW; the partitions use 4-bit codes and table lookup, as ScaNN and faiss fast-scan do.
 
----
+## Where it does not fit, and the limits
 
-## Compared with other products
+Stated first. If one of these is you, another tool will suit better.
 
-All figures are the author's own measurements and have not been independently verified. Conditions are under *Speed* below.
+- **You want the operation taken care of.** KCI-Vec is a component. There is no elastic server, no distribution over several machines, no console.
+- **The data does not fit in memory.** The index is searched in memory. There is no on-SSD search (DiskANN-style) yet.
+- **You want answers written for you.** It returns the closest items. The model that writes an answer is separate.
+- One writer at a time. To change the index while it is searched, go through the Python layer or the PostgreSQL extension.
+- The quantized graph (the faster form of the graph) has to be rebuilt after inserts.
+- L2 and inner-product indexes get coarse when a few vectors are far longer than the rest. They suit data of even lengths.
+- Data with many identical vectors lowers the graph's recall as it is. Use `kci_vec_set_dedup` (since 0.2.8).
+- Files saved from an index with `kci_vec_set_dedup`, or with the memory-first quantized graph (`kci_vec_build_qg_res`), cannot be read by versions up to 0.2.7 (they refuse them).
+- ARM runs mostly the portable C path and is slower than x86.
+- The distributed Python package (wheel) is for Linux x86-64 only. The source is built and tested on Linux and Windows (MinGW-w64).
 
-**Compared with vector databases that run as a server**
-- **Nothing to operate**: a search is a function call inside your process. No server to start, monitor, upgrade or network.
-- **Ships with your application**: one wheel (one library inside), one file per index.
-- **No network round trip** per query (a difference in design; not measured here).
+## Measured results
 
-**Compared with embedded libraries (ScaNN, hnswlib, …)**
-- **Faster**: on the same machines with the same official harness, 2.2–5.3× ScaNN 1.4.2 (partitioned index) and
-  8.7–13.8× hnswlib 0.8.0 (graph index; 9950X, hnswlib with a reduced grid) on glove-100 (cosine); 2.2–2.4× ScaNN and
-  2.6–3.1× hnswlib on sift-128 (L2, partitioned index).
-- **Smaller**: one byte per dimension (int8), about a quarter of an index held in float32.
-- **All in one**: insert / delete / compact after the build, metadata filtering, keyword (BM25) + vector ranking, and
-  encrypted, authenticated saves — without combining separate components.
+**All measured by the developer.** Competitors use their official configurations; the KCI-Vec settings include ones
+chosen while looking at results. The order changes with the data, the dimension and the machine.
 
-**Compared with other quantized-graph methods (qsgngt, glass, SymphonyQG, NGT-QG)**
-- **glove-100**: against qsgngt, 1–7 % behind at recall 0.90 and 0.95 and 1.16–1.30× at 0.99 on the Xeon; 1.34–1.55× on the 9950X.
-- **VIBE, the embedding benchmark (yahoo-minilm-384, k = 100)**: 1.09–1.36× glass, 1.3–1.6× SymphonyQG, 1.4–2.0× NGT-QG
-  (Xeon and 9950X; the others measured a day or two before on the same machines).
-- **Faster to build**: on one core, about a seventh of qsgngt's build time on glove-100 (1,867 s vs 13,051 s, partitioned
-  index, Xeon), and under a quarter of NGT-QG's on VIBE yahoo (249–458 s vs 1,894–3,884 s,
-  graph index, Xeon, best-point indexes on both sides).
+glove-100 (1.18 M × 100), the official ANN-Benchmarks harness, one core, best QPS at recall@10 ≥ 0.90 / 0.95 / 0.99:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_build_en_dark.svg">
-  <img alt="One-core build time on VIBE yahoo-minilm-384, Intel Xeon 8375C, of the index behind each algorithm's fastest setting at recall@100 0.95: KCI-Vec graph 249 s, LoRANN 258 s, ScaNN 313 s, KCI-Vec partitioned 366 s, glass 394 s, SymphonyQG 438 s, PAG 899 s, NGT-QG 3,884 s." src="docs/img/vibe_build_en_light.svg" width="960">
-</picture>
-
-**Where it is weaker**
-- The graph index (compact layout) is large: 3.3–4.3× glass's memory on VIBE yahoo (best-point indexes).
-- On 1024-dimensional L2 data (VIBE agnews), versions up to 0.2.2 did not reach glass from recall 0.95 up. 0.2.3 does (see below), but its index takes about twice glass's memory.
-- The evaluation build is Linux x86-64 only.
-
----
-
-## Speed
-
-glove-100-angular (1.18 M × 100), official ANN-Benchmarks harness: k = 10, one CPU core, 10,000 queries, best of 5 runs
-per setting. Best QPS at recall@10 ≥ 0.90 / 0.95 / 0.99.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/glove100_qps_en_dark.svg">
-  <img alt="Best QPS at recall@10 0.90 / 0.95 / 0.99 on glove-100-angular, Xeon 8375C and Ryzen 9 9950X: KCI-Vec graph, KCI-Vec partitioned, qsgngt, ScaNN, hnswlib. Values in the table below." src="docs/img/glove100_qps_en_light.svg" width="960">
-</picture>
-
-| algorithm | Intel Xeon 8375C (AWS r6id.4xlarge) | AMD Ryzen 9 9950X |
+| | Intel Xeon 8375C | AMD Ryzen 9 9950X |
 |---|---|---|
-| **KCI-Vec — graph** (compact layout, preview) | **16,253 / 9,851 / 4,414** | **36,951 / 21,800 / 9,440** |
-| **KCI-Vec — partitioned** | 12,331–14,725 / 8,694–10,493 / 3,302–4,138 | 34,670 / 24,321 / 9,747 |
-| qsgngt 5.0.0 (full official config) | 16,339–16,809 / 10,282–10,618 / 3,408–3,789 | 27,678 / 15,089 / 6,099 |
-| ScaNN 1.4.2 (full official config) | 4,438–4,508 / 2,190–2,219 / 783–794 | 15,611 / 8,195 / 3,085 |
-| hnswlib 0.8.0 | — | 4,268 / 1,898 / 685 |
+| KCI-Vec graph | 16,253 / 9,851 / 4,414 | 36,951 / 21,800 / 9,440 |
+| KCI-Vec partitions | 12,331–14,725 / 8,694–10,493 / 3,302–4,138 | 34,670 / 24,321 / 9,747 |
+| qsgngt 5.0.0 | 16,339–16,809 / 10,282–10,618 / 3,408–3,789 | 27,678 / 15,089 / 6,099 |
+| ScaNN 1.4.2 | 4,438–4,508 / 2,190–2,219 / 783–794 | 15,611 / 8,195 / 3,085 |
 
-- Ranges are min–max over repeated runs on the same machine: six runs for KCI-Vec partitioned and ScaNN, three for qsgngt, one otherwise.
-- **All figures are the author's own measurements and have not been independently verified.** They are not compared
-  with the figures on ann-benchmarks.com, which were taken at another time on other machines.
-- Rankings depend on the CPU and the recall target; treat these as specific measurements, not a general ranking.
+![Best QPS on glove-100](docs/img/annb_glove100_xeon_9950x_202611.svg)
 
-### Speed with Euclidean (L2) distance
+The VIBE flow (a benchmark on data from current embedding models), k = 100, one core, 9950X, best QPS at recall@100 ≥ 0.90 / 0.95 / 0.99
+(KCI-Vec 0.2.5; glass measured on the same machine on 2026-11-19):
 
-sift-128-euclidean (1 M × 128), same harness and conditions, AMD Ryzen 9 9950X, wheel 0.2.0. Best QPS at
-recall@10 ≥ 0.90 / 0.95 / 0.99.
-
-| algorithm | AMD Ryzen 9 9950X |
-|---|---|
-| **KCI-Vec — partitioned** | **53,001 / 40,297 / 20,155** |
-| **KCI-Vec — graph** (compact layout, preview) | 51,332 / 39,317 / 12,971 |
-| ScaNN 1.4.2 (full official config) | 23,563 / 16,494 / 8,504 |
-| hnswlib 0.8.0 (full official config) | 20,294 / 13,807 / 6,502 |
-
-- One run each, the author's own measurements, not independently verified.
-- The graph's 0.99 figure comes from settings added after the first run (which stopped at recall 0.98).
-- qsgngt is not listed: its binary distribution did not produce results on this dataset in our environment.
-- sift-128 vectors have similar lengths; data with widely differing lengths needs more work for the same recall (see Limitations).
-
-### Speed on VIBE, the embedding benchmark
-
-[VIBE](https://github.com/vector-index-bench/vibe), official container flow, yahoo-minilm-384-normalized (677 k × 384,
-cosine): k = 100, one core for build and search, best of 5 runs per setting. Best QPS at recall@100 ≥ 0.90 / 0.95 / 0.99.
-KCI-Vec is wheel 0.2.1.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_qps_en_dark.svg">
-  <img alt="Best QPS at recall@100 0.90 / 0.95 / 0.99 on VIBE yahoo-minilm-384, Xeon 8375C and Ryzen 9 9950X: KCI-Vec graph, KCI-Vec partitioned, glass, SymphonyQG, NGT-QG. Values in the table below." src="docs/img/vibe_qps_en_light.svg" width="960">
-</picture>
-
-| algorithm | Intel Xeon 8375C (AWS r6id.4xlarge) | AMD Ryzen 9 9950X |
+| | yahoo (cosine, 384 dims) | agnews (L2, 1024 dims) |
 |---|---|---|
-| **KCI-Vec — graph** (compact layout, preview) | **9,669 / 7,934 / 5,336** | **19,267 / 16,074 / 10,900** |
-| **KCI-Vec — partitioned** | 7,383 / 6,287 / 2,969 | 18,126 / 13,642 / 5,802 |
-| glass | 8,844 / 6,575 / 4,854 | 15,010 / 11,811 / 8,861 |
-| SymphonyQG | 7,066 / 6,001 / 3,789 | 12,476 / 10,527 / 6,784 |
-| NGT-QG | 6,887 / 4,916 / 3,266 | 11,497 / 8,256 / 5,339 |
-| LoRANN | 6,417 / 3,398 / 1,297 | 16,991 / 8,690 / 3,024 |
-| ScaNN | 3,203 / 2,057 / 645 | 10,456 / 6,755 / 2,459 |
+| KCI-Vec graph | 21,294 / 18,197 / 12,139 | 13,619 / 9,649 / 5,982 |
+| glass | 14,860 / 11,892 / 8,874 | 9,877 / 7,378 / 4,961 |
 
-- One run each, the author's own measurements. The others ran with VIBE's own grids, on the same machines a day or two
-  before KCI-Vec.
-- **KCI-Vec's grid was widened after looking at results on this dataset** (two dims per code, int8 re-scoring, ef 220 / 250).
-- On 1024-dimensional L2 data (agnews-mxbai-1024-euclidean, 9950X) glass was faster than 0.2.1 from recall 0.95 up
-  (KCI-Vec graph 9,653 / 6,328 / 3,470, glass 9,875 / 7,425 / 4,693). Measured again with 0.2.3 on one night:
-  KCI-Vec 12,464 / 9,631 / 5,912, glass 9,877 / 7,378 / 4,961 (2026-11-19, one run; the KCI-Vec settings were chosen by us).
-  Index memory: KCI-Vec 5.0-7.4 GB, glass 2.5-3.6 GB.
+- On the Xeon with glove-100 it is level with or slightly below qsgngt at 0.90 and 0.95, and above at 0.99.
+- The agnews figures are from 0.2.3 on. Up to 0.2.2 it was behind glass from 0.95 up.
+- The KCI-Vec index is larger than glass on these two datasets (at the points above, yahoo: 4.9–5.0 GB against 0.7–0.8 GB; agnews: 5.0–7.4 GB against 2.5–3.6 GB).
+  A memory-first form was added in 0.2.8 (not yet measured in the VIBE flow).
+- There are places it does not reach: on glove-200, for example, neither method reached recall 0.99.
+- The comparison with pgvector inside PostgreSQL is under "From PostgreSQL" below.
+- Leaderboards: submitted to ANN-Benchmarks ([PR #643](https://github.com/erikbern/ann-benchmarks/pull/643)); VIBE is in preparation.
 
-  ![agnews (L2, 1024 dims) on the 9950X: KCI-Vec 0.2.3 contents, glass, KCI-Vec 0.2.2](docs/img/vibe_agnews_9950x_20261119.svg)
+## Usage
 
-- Not yet submitted to VIBE. Not compared with the figures on vector-index-bench.github.io (another time, other machines).
-
----
-
-## Method
-
-- It builds on published methods: HNSW, which walks a graph, and a partitioned index with 4-bit codes (the family ScaNN belongs to).
-- Vectors are kept in a compressed form, and only the best candidates are re-ordered at full precision at the end.
-- The speed comes less from doing fewer computations than from reading memory less often.
-- In exchange, the faster method needs a larger index.
-
-### Where it is not ahead
-
-- Memory: the fastest graph settings take 3.3–4.3× glass's memory (VIBE yahoo, Xeon).
-- 1024-dimensional L2 data (VIBE agnews): the index takes about twice glass's memory (5.0-7.4 GB against 2.5-3.6 GB).
-
----
-
-## Two index types
-
-- **Graph** — links each vector to its nearest neighbours and walks towards the query. Takes inserts and deletes; the
-  compact layout (preview) gives the top figures above.
-- **Partitioned** — groups the vectors and scans only the groups nearest to the query. No graph to build.
-
-Both support encrypted save / load, metadata filtering and float re-ranking.
-
----
-
-## Install
+### Install
 
 ```sh
+# Python (Linux x86-64): the distributed package
 pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.14/kci_vec-0.2.14-py3-none-manylinux_2_35_x86_64.whl
+
+# From source
+sh build_kci_vec.sh          # libkci_vec.{so|dylib} and example_kci_vec   (Linux / macOS)
+# Windows: gcc -O3 -march=native -shared -static -static-libgcc -o libkci_vec.dll kci_vec.c
+# Python:  pip install ./clients/python
 ```
 
-Requirements: Linux x86-64 with glibc 2.35 or later (e.g. Ubuntu 22.04+, Debian 12+), a CPU with AVX2 (AVX-512 is
-used when present), Python 3.8+, NumPy.
-
-sha256 of the wheel: `fb224d0945729fbca004e6d592542718d15685f08ae4b10ad64d73655efd4067`
-
----
-
-## Quick start
+### Python (your own vectors)
 
 ```python
-import numpy as np
 from kci_vec import KciVec
 
-v = KciVec(dim=384, rerank=200)            # keep the float vectors for re-ranking
-v.add_many(range(len(embeddings)), embeddings)
-v.build_lists()                            # partitioned index (v.build() for the graph)
-
-for doc_id, score in v.search(query, k=10):
+v = KciVec(dim=384, rerank=200)          # L2: metric="l2"; inner product: metric="ip"
+v.add_many(ids, embeddings)              # float32 [n, dim]
+v.build_lists()                          # the partitions (v.build() for the graph)
+for doc_id, score in v.search(query_vec, k=5):
     ...
-
-allowed = {3, 17, 42}
-hits = v.search(query, k=10, filter=lambda i: i in allowed)   # metadata / access control
-
-v.save("index.kv", key=b"a long secret")   # encrypted at rest
-v2 = KciVec.load("index.kv", key=b"a long secret")
+hits = v.search(query_vec, k=5, filter=allowed_ids)   # filtered
+v.save("index.kv", key=b"secret")        # encrypted
 ```
 
-Scores are cosine similarities, highest first. For many queries at once, `v.search_many(queries, k=10)` returns
-`(ids, scores)` arrays.
+### C
 
-**Full guide** — every function, the fast graph, settings to start from, and the rules to keep:
-[API.md](https://github.com/KimYuki3/kci-vec-src/blob/main/docs/API.md).
-
-### Euclidean (L2) distance
-
-New in 0.2.0. Pass `metric="l2"`; the vectors keep their length (they are not normalized), and both index types,
-filtering and encrypted save / load work as for cosine.
-
-```python
-v = KciVec(dim=128, rerank=200, metric="l2")
-v.add_many(range(len(vectors)), vectors)
-v.build_lists()                            # or v.build() for the graph
-
-for doc_id, dist2 in v.search(query, k=10):   # squared distance |q - x|^2, smallest first
-    ...
+```c
+KciVec *v = kci_vec_new(dim, /*M*/16, /*efc*/200);      // L2: kci_vec_new_l2; inner product: kci_vec_new_ip
+kci_vec_add(v, id, float_vec);
+kci_vec_build(v, /*threads*/0, &secs);                   // build the graph (0 = all cores)
+kci_vec_search(v, query, k, /*ef*/100, out_ids, out_scores);
+kci_vec_save(v, "index.kv", key, keylen);                // encrypted if a key is given (NULL = plaintext)
+KciVec *v2 = kci_vec_load("index.kv", key, keylen);
+kci_vec_free(v);
 ```
 
-The method that maps Euclidean distance onto the cosine index is patent pending
-(Japanese Patent Application No. 2026-241178). This notice covers that method only.
+For speed, create one `KciVecSearcher` per thread and reuse it. The whole flow is in `example_kci_vec.c`; every
+function is described above its declaration in `kci_vec.h`.
 
-### Inner product
+### From PostgreSQL (the extension in `pg/`, a prototype)
 
-New in 0.2.2. Pass `metric="ip"`; the vectors keep their length and the score is `q·x`, largest first. Both index
-types, filtering and encrypted save / load work as for cosine. It uses the published reduction of inner-product
-search to cosine search (Bachrach et al., 2014); it is not a new method.
-
-```python
-v = KciVec(dim=768, rerank=200, metric="ip")
-v.add_many(range(len(vectors)), vectors)
-v.build()                                  # or v.build_lists()
-
-for doc_id, score in v.search(query, k=10):   # q·x, largest first
-    ...
+```sql
+SELECT kci_vec_build('docs', 'docs', 'id', 'embedding');            -- build from the table docs(id, embedding)
+SELECT kci_vec_track('docs');                                        -- follow INSERT / UPDATE / DELETE from now on
+SELECT id, score FROM kci_vec_search('docs', '[0.1, ...]'::vector, 10);
 ```
 
-When queries and data are distributed differently and a sample of queries with their true neighbours is available,
-0.2.2 also has `learn(...)` / `search_learned(...)` and `vote_set(...)` / `search_voted(...)`, which take their
-candidates from that sample. They implement known ideas (the family of RoarGraph and MLANN), not a new method; see
-the [release notes](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2).
+- The server, permissions, backup and replication are PostgreSQL's own. Changes to the table show up in searches at once.
+- Cosine, L2 and inner product. Tested on PostgreSQL 15 / 16 / 17.
+- Not pgvector's syntax: functions, not `CREATE INDEX` and `<=>`.
+- For a PostgreSQL you manage yourself. Managed services that do not let you install extensions cannot use it.
+- The extension's index files are not encrypted for now (use disk encryption with it).
 
----
+Against pgvector 0.8.1 (HNSW, m 16, ef_construction 200) on the same machine, the same table and the same SQL
+round trip (glove-100, 1.18 M rows, one connection, k = 10, three alternating rounds, Ryzen 7 8845HS, PostgreSQL 16, 2026-11-20):
 
-## Limitations of the evaluation build
+| | recall@10 | queries/s |
+|---|---|---|
+| KCI-Vec | 0.9005 | 3,261–3,906 |
+| pgvector (ef_search 240) | 0.8947 | 199–210 |
+| KCI-Vec | 0.9632 | 1,776–2,206 |
+| pgvector (ef_search 1000, the maximum) | 0.9612 | 58–59 |
 
-- Linux x86-64 only. Cosine similarity, Euclidean (L2) distance and inner product.
-- L2: when vector lengths differ widely (more than about 4×), the partitioned index needs a larger `nprobe` /
-  `rerank_n` than a cosine index for the same recall.
-- The compact graph layout is a preview: it is not saved yet, and an insert drops it until it is rebuilt.
-- One writer at a time: do not modify an index while searching it.
-- During a build the float vectors are held in memory; an SSD-resident index is not available.
+One dataset, one machine. Concurrent connections and filtered search were not measured. Usage and limits: `pg/README.md`.
 
----
+## Encryption and checks
+
+- Standard primitives only: AES-256-CTR, AES-256-CMAC, keys from PBKDF2-HMAC-SHA256 with a salt per save.
+  AES and CMAC are checked against the known answers of FIPS-197 and SP 800-38B.
+- Decryption happens only at load, so searching is as fast as without encryption.
+- A wrong key, a damaged file or an altered file is not loaded. Saves go through a temporary file and a rename, so a crash midway leaves the old file intact.
+- Checks: hostile inputs and 32 concurrent threads with zero ASan / UBSan reports.
+
+## Source
+
+The C source, the Python client, the PostgreSQL extension, the tests and the guides are in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src).
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE) — the same license as the source ([kci-vec-src](https://github.com/KimYuki3/kci-vec-src)).
-Free for research, educational, personal and other non-commercial use; commercial use requires a separate license.
-(Until 2026-11-13 this repository had its own non-commercial license with the same intent.)
+[PolyForm Noncommercial 1.0.0](LICENSE): free for research, education, personal and other non-commercial use.
+Commercial use needs a separate license — open an issue in
+[kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues) saying so, and a private contact will follow.
 
 Required Notice: Copyright 2026 Yukihiro Kimura (https://github.com/KimYuki3)
 
-**Contact** — questions, bug reports and commercial licensing: open an issue in this repository
-([KimYuki3/kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues)). Issues are public; for a commercial inquiry,
-a one-line issue is enough and a private channel will be arranged from there.
+The method that maps Euclidean distance onto the cosine index is patent pending

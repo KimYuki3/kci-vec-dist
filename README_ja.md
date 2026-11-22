@@ -1,271 +1,194 @@
 # KCI-Vec
 
-**アプリに組み込む、速くて軽いベクトル検索。**
-プロセスの中で動く 1 つのライブラリ。サーバも依存もなく、ノート PC から Xeon まで動きます。必要なら、保存する索引を暗号化することもできます。
+自分のアプリの中で動く、ベクトル検索のライブラリです。文書や画像の中から、意味の近いものを探します。
+検索サーバーは立てません。データは自分の機械の外に出ません。保存するファイルは暗号化できます。
 
-*[English](README.md)* · **紹介ページ:** <https://claude.ai/artifact/CCvYMLaDGKzNeFKUBGR69A#ja>
+> このリポジトリは、評価用の配布物 (Python の wheel、Linux x86-64) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.14](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.14)、sha256 `fb224d0945729fbca004e6d592542718d15685f08ae4b10ad64d73655efd4067`)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
 
-このリポジトリでは **評価用の部品** を配っています。Linux x86-64 用の Python の wheel で、cosine 類似度、ユークリッド (L2) 距離、内積に対応しています。
-
-**ダウンロード:** wheel はファイルの一覧ではなく、版ごとの配布の置き場にあります — **[Releases](https://github.com/KimYuki3/kci-vec-dist/releases)** (最新は [v0.2.14](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.14))。入れ方は下の「入れ方」の `pip install` の 1 行です。
-
-**ソース:** **[KimYuki3/kci-vec-src](https://github.com/KimYuki3/kci-vec-src)** — C のソース (0.2.3 から 3 つの距離すべて)、Python の包み、ANN-Benchmarks の部品。ライセンスは PolyForm Noncommercial 1.0.0 です。wheel はこのソースから作っています。0.2.6 からは、実験的なスパースの索引とハイブリッドの合わせ方 (`kci_vec.sparse`、`kci_vec.hybrid`) も入っています。できること・制限・確かめた環境は、ソースのリポジトリの README にあります。 0.2.9 からは、文章を渡すだけで探せる `kci_vec.text` (実験的。torch と transformers は自分で入れます) も入っています。 0.2.8 からは、ソースに PostgreSQL の拡張 (試作、`pg/`。wheel には入っていません) もあります。
-
----
-
-## ひと目で
+*[English](README.md)*
 
 | | |
 |---|---|
-| **組み込み** | アプリのプロセスの中で動きます。サーバも JVM も、運用の手間もありません |
-| **速い** | 公式 ANN-Benchmarks の手順で ScaNN 1.4.2 の約 2〜5 倍。qsgngt とも、同じ機械で並ぶか上回ります |
-| **軽い** | 1 次元 1 バイト。float32 の約 4 分の 1 のメモリで動きます |
-| **更新できる** | 作ったあとも追加・削除・詰め直しができます |
-| **探し方を足せる** | 属性・権限での絞り込み、キーワードとベクトルを合わせた順位付け |
-| **暗号化もできる** | 要るときだけ。保存する索引を AES-256-CTR で暗号化し、AES-256-CMAC で改ざんを検出します。使わなければ手間も費用もかかりません |
+| 形 | C のファイル 1 つ (`kci_vec.c` + `kci_vec.h`)。ほかのライブラリに依存しません。Python からも呼べます |
+| 向く場面 | 社内のシステム、手元の端末、製品に組み込む検索。データを外のサービスに預けられない所 |
+| 大きさの目安 | 数万〜数百万件。ベクトルは 1 次元 1 バイトで持つので、メモリは float の約 4 分の 1 です |
+| いまの版 | 0.2.14 (2026-11-22)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| 段階 | 研究段階です。数字はすべて開発者自身の計測で、第三者の確認はまだ受けていません |
 
-検索のためだけにベクトル DB を立てて運用したくない場合に向いています。アプリに入れて配る、手元の端末で動かす、データを外に出さずに探す、
-といった使い方です。
+## 最初の 10 分: 文章を入れて、質問する
 
----
+ベクトルやモデルのことを知らなくても始められます。文章を渡すと、中でベクトルに変えて索引を作ります。
 
-## 利用できる用途
+```python
+from kci_vec.text import TextIndex
 
-| 用途 | 例 | 生きる性質 |
-|---|---|---|
-| **アプリの中の検索** | デスクトップや端末のアプリで、メモ・メール・ファイルを意味で探す | サーバが要らず、プロセスの中で動く。メモリは float32 の約 4 分の 1 |
-| **言葉の一致も要る検索** | 品番・人名・数字のように、意味だけでは拾えない語を含む問い | キーワードとベクトルを合わせた順位付け |
-| **権限に合わせた検索** | 部署や役職で見てよい文書だけを結果に出す | id に対する条件での絞り込み |
-| **社内の文書の検索・RAG** | 社内規程や手順書、問い合わせの履歴を、AI に答えさせる前に意味で探す | 外部のサービスに送らずに済む。要るなら索引を暗号化し、改ざんを検出できる |
-| **利用者ごとに分けた索引** | サービスで、お客さまごとに索引のファイルを分ける | 索引は 1 つのファイル。要るなら、お客さまごとに別の鍵で暗号化できる |
-| **手法の比べ・研究** | ほかのライブラリと同じ手順で速さを比べる | wheel を pip で入れるだけで動く (ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src))。ANN-Benchmarks の部品は [erikbern/ann-benchmarks#643](https://github.com/erikbern/ann-benchmarks/pull/643) で申し込み中 |
+ix = TextIndex("ja", sparse="bm25")
+ix.add([
+    "有給休暇は入社半年後に10日付与されます。申請は3営業日前までに上長へ。",
+    "経費の精算は月末締めです。領収書の原本を総務に提出してください。",
+    "パスワードを忘れたときは、情報システム課の内線1234に連絡してください。",
+])
+for hit in ix.search("有給は何日もらえますか", k=2):
+    print(hit.id, round(hit.score, 3), hit.text)
 
-評価用の部品で対応していないこと (動く環境、更新の仕方、ライセンス) は、下の「評価用の部品の制限」と「ライセンス」の節にあります。
-
----
-
-## ほかの製品と比べて
-
-数字はどれも開発者自身の計測で、第三者による確認はまだありません。条件は下の「速さ」の節にあります。
-
-**サーバとして動くベクトル DB と比べて**
-- **運用するものが無い**: 検索はプロセスの中の関数呼び出しです。サーバの立ち上げ・監視・更新・ネットワークの設定が要りません。
-- **アプリと一緒に配れる**: 部品は 1 つの wheel (中身は 1 つのライブラリ)、索引は 1 つのファイルです。
-- **通信の往復が無い**: 質問のたびにネットワークを通りません (仕組みの違いで、ここでは測っていません)。
-
-**組み込みのライブラリ (ScaNN、hnswlib など) と比べて**
-- **速い**: 同じ機械・同じ公式の手順で、glove-100 (cosine) では区分け方式で ScaNN 1.4.2 の 2.2〜5.3 倍、グラフ方式で hnswlib 0.8.0 の
-  8.7〜13.8 倍 (9950X。hnswlib は設定の組を減らして計測)。sift-128 (L2) では区分け方式で ScaNN の 2.2〜2.4 倍、hnswlib の 2.6〜3.1 倍。
-- **メモリが小さい**: ベクトルは 1 次元 1 バイト (int8) で、float32 で持つ索引の約 4 分の 1 です。
-- **1 つで揃う**: 作ったあとの追加・削除・詰め直し、属性での絞り込み、キーワード (BM25) との組み合わせ、暗号化と改ざん検出つきの保存を、
-  別の部品を組み合わせずに使えます。
-
-**量子化グラフの仲間 (qsgngt、glass、SymphonyQG、NGT-QG) と比べて**
-- **glove-100**: qsgngt に対して、Xeon では recall 0.90・0.95 で 1〜7 % 下、0.99 で 1.16〜1.30 倍。9950X では 1.34〜1.55 倍。
-- **埋め込みの VIBE (yahoo-minilm-384、k=100)**: glass の 1.09〜1.36 倍、SymphonyQG の 1.3〜1.6 倍、NGT-QG の 1.4〜2.0 倍 (Xeon と 9950X。相手は 1〜2 日前に同じ機械で測った値)。
-- **作るのが速い**: 1 コアで索引を作る時間は、glove-100 で qsgngt の約 7 分の 1 (1,867 秒 対 13,051 秒、区分け方式、Xeon)、
-  VIBE の yahoo で NGT-QG の 4 分の 1 以下 (249〜458 秒 対 1,894〜3,884 秒、グラフ方式、Xeon、どちらも最良点の索引)。
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_build_ja_dark.svg">
-  <img alt="VIBE の yahoo-minilm-384、Intel Xeon 8375C で、recall@100 0.95 でいちばん速かった設定の索引を 1 コアで作る時間。KCI-Vec グラフ方式 249 秒、LoRANN 258 秒、ScaNN 313 秒、KCI-Vec 区分け方式 366 秒、glass 394 秒、SymphonyQG 438 秒、PAG 899 秒、NGT-QG 3,884 秒。" src="docs/img/vibe_build_ja_light.svg" width="960">
-</picture>
-
-**弱いところも書いておきます**
-- グラフ方式 (詰めた配置) の索引は大きく、VIBE の yahoo では最良点の索引どうしで glass の 3.3〜4.3 倍のメモリを使います。
-- 1024 次元の L2 のデータ (VIBE の agnews) では、0.2.2 までは recall 0.95 から上で glass に届いていませんでした。0.2.3 では上回りましたが (下の節)、索引のメモリは glass の約 2 倍です。
-- 評価用の部品は Linux x86-64 だけです。
-
----
-
-## 速さ
-
-glove-100-angular (118 万件 × 100 次元)、公式 ANN-Benchmarks の手順 (k=10、1 コア、質問 1 万、各設定 5 回の最速)。
-recall@10 が 0.90 / 0.95 / 0.99 以上での最良 QPS (1 秒あたりの検索数) です。
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/glove100_qps_ja_dark.svg">
-  <img alt="glove-100-angular の recall@10 0.90 / 0.95 / 0.99 での最良 QPS。Xeon 8375C と Ryzen 9 9950X で、KCI-Vec グラフ方式・区分け方式・qsgngt・ScaNN・hnswlib を並べた棒グラフ。値は下の表。" src="docs/img/glove100_qps_ja_light.svg" width="960">
-</picture>
-
-| 算法 | Intel Xeon 8375C (AWS r6id.4xlarge) | AMD Ryzen 9 9950X |
-|---|---|---|
-| **KCI-Vec グラフ方式** (詰めた配置、先行版) | **16,253 / 9,851 / 4,414** | **36,951 / 21,800 / 9,440** |
-| **KCI-Vec 区分け方式** | 12,331〜14,725 / 8,694〜10,493 / 3,302〜4,138 | 34,670 / 24,321 / 9,747 |
-| qsgngt 5.0.0 (公式の全設定) | 16,339〜16,809 / 10,282〜10,618 / 3,408〜3,789 | 27,678 / 15,089 / 6,099 |
-| ScaNN 1.4.2 (公式の全設定) | 4,438〜4,508 / 2,190〜2,219 / 783〜794 | 15,611 / 8,195 / 3,085 |
-| hnswlib 0.8.0 | — | 4,268 / 1,898 / 685 |
-
-- 幅のある値は、同じ機械で繰り返した計測の最小〜最大です。KCI-Vec 区分け方式と ScaNN は 6 回、qsgngt は 3 回、それ以外は 1 回です。
-- **すべて開発者自身の計測で、第三者による確認はまだありません。** ann-benchmarks.com の数字とは比べていません (時期も機械も違うため)。
-- 順位は CPU と目標の recall で変わります。一般的な順位ではなく、特定の条件での計測としてご覧ください。
-
-### ユークリッド (L2) 距離の速さ
-
-sift-128-euclidean (100 万件 × 128 次元)。上と同じ計測の道具と条件で、AMD Ryzen 9 9950X、wheel 0.2.0 です。
-recall@10 が 0.90 / 0.95 / 0.99 以上になる設定のうち、いちばん速い QPS です。
-
-| 算法 | AMD Ryzen 9 9950X |
-|---|---|
-| **KCI-Vec 区分け方式** | **53,001 / 40,297 / 20,155** |
-| **KCI-Vec グラフ方式** (詰めた配置、先行版) | 51,332 / 39,317 / 12,971 |
-| ScaNN 1.4.2 (公式の全設定) | 23,563 / 16,494 / 8,504 |
-| hnswlib 0.8.0 (公式の全設定) | 20,294 / 13,807 / 6,502 |
-
-- どれも 1 回ずつの、開発者自身の計測です。第三者による確認はまだありません。
-- グラフ方式の 0.99 の値は、最初の計測 (recall 0.98 まで) のあとに設定を足して計ったものです。
-- qsgngt は載せていません。配布されているバイナリが、私たちの環境ではこのデータで結果を出せませんでした。
-- sift-128 は長さのそろったデータです。長さが大きく違うデータでは、同じ recall を出すのにより多くの手間が要ります (制限の節)。
-
-### 埋め込みのベンチマーク VIBE での速さ
-
-[VIBE](https://github.com/vector-index-bench/vibe) の公式のコンテナの流れで、yahoo-minilm-384-normalized (67.7 万件 × 384 次元、cosine)。
-k=100、索引作りも検索も 1 コア、各設定 5 回の最速。recall@100 が 0.90 / 0.95 / 0.99 以上での最良 QPS です。KCI-Vec は wheel 0.2.1 です。
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/vibe_qps_ja_dark.svg">
-  <img alt="VIBE の yahoo-minilm-384 の recall@100 0.90 / 0.95 / 0.99 での最良 QPS。Xeon 8375C と Ryzen 9 9950X で、KCI-Vec グラフ方式・区分け方式・glass・SymphonyQG・NGT-QG を並べた棒グラフ。値は下の表。" src="docs/img/vibe_qps_ja_light.svg" width="960">
-</picture>
-
-| 算法 | Intel Xeon 8375C (AWS r6id.4xlarge) | AMD Ryzen 9 9950X |
-|---|---|---|
-| **KCI-Vec グラフ方式** (詰めた配置、先行版) | **9,669 / 7,934 / 5,336** | **19,267 / 16,074 / 10,900** |
-| **KCI-Vec 区分け方式** | 7,383 / 6,287 / 2,969 | 18,126 / 13,642 / 5,802 |
-| glass | 8,844 / 6,575 / 4,854 | 15,010 / 11,811 / 8,861 |
-| SymphonyQG | 7,066 / 6,001 / 3,789 | 12,476 / 10,527 / 6,784 |
-| NGT-QG | 6,887 / 4,916 / 3,266 | 11,497 / 8,256 / 5,339 |
-| LoRANN | 6,417 / 3,398 / 1,297 | 16,991 / 8,690 / 3,024 |
-| ScaNN | 3,203 / 2,057 / 645 | 10,456 / 6,755 / 2,459 |
-
-- どれも 1 回ずつの、開発者自身の計測です。相手は VIBE 公式の設定の組そのままで、KCI-Vec の 1〜2 日前に同じ機械で測りました。
-- **KCI-Vec の設定の組は、このデータの結果を見ながら足したものです** (2 次元 1 符号、int8 での並べ直し、ef 220・250 など)。
-- 1024 次元の L2 のデータ (agnews-mxbai-1024-euclidean、9950X) は、0.2.1 では recall 0.95 から上で glass が速いデータでした
-  (KCI-Vec グラフ方式 9,653 / 6,328 / 3,470、glass 9,875 / 7,425 / 4,693)。0.2.3 で同じ夜に測り直すと
-  KCI-Vec 12,464 / 9,631 / 5,912、glass 9,877 / 7,378 / 4,961 でした (2026-11-19、1 回の計測。KCI-Vec の設定の組はこちらで選んだもの)。
-  索引のメモリは KCI-Vec 5.0〜7.4 GB、glass 2.5〜3.6 GB です。
-
-  ![9950X の agnews (L2、1024 次元): KCI-Vec 0.2.3 の中身・glass・KCI-Vec 0.2.2](docs/img/vibe_agnews_9950x_20261119.svg)
-
-- VIBE にはまだ登録していません。公開サイト (vector-index-bench.github.io) の数字とは比べていません (時期も機械も違うため)。
-
----
-
-## 方式
-
-- 土台は公開されている方式です。グラフをたどる HNSW と、かたまりに分けて 4 ビットの符号で見積もる方式 (ScaNN と同じ系統) の 2 つを持ちます。
-- ベクトルは小さく縮めて持ち、最後に上位だけを元の精度で並べ直します。
-- 速さは、計算の量よりも、メモリの読み方を減らすことで出しています。
-- 代わりに、速いほうの方式は索引が大きくなります。
-
-### 勝っていないところ
-
-- メモリ: いちばん速いグラフの設定は、glass の 3.3〜4.3 倍のメモリを使います (VIBE yahoo、Xeon)。
-- 1024 次元の L2 データ (VIBE agnews): 索引のメモリは glass の約 2 倍です (5.0〜7.4 GB 対 2.5〜3.6 GB)。
-
----
-
-## 2 つの探し方
-
-- **グラフ方式** — 近いベクトルどうしを線でつなぎ、質問に近いほうへたどります。追加・削除に対応し、詰めた配置 (先行版) で上の表の最上段の数字が出ます。
-- **区分け方式** — ベクトルをかたまりに分け、質問に近いかたまりだけを調べます。グラフを作る必要がありません。
-
-どちらも暗号化保存、属性での絞り込み、float での並べ直しに対応しています。
-
----
-
-## 入れ方
-
-```sh
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.14/kci_vec-0.2.14-py3-none-manylinux_2_35_x86_64.whl
+ix.save("my_index", key="合言葉")          # 索引も本文も暗号化して保存
 ```
 
-必要なもの: Linux x86-64 (glibc 2.35 以降。例えば Ubuntu 22.04 以降、Debian 12 以降)、AVX2 のある CPU (AVX-512 があれば使います)、
-Python 3.8 以降、NumPy。
+入れる所から、自分のファイルを入れて保存し、開き直して質問する所までの手順は
+**[docs/quickstart_text_ja.md](https://github.com/KimYuki3/kci-vec-src/blob/main/docs/quickstart_text_ja.md)** にあります (まっさらな環境で、上から順に打って確かめた手順です)。
+この層 (`kci_vec.text`) は実験的で、いまは Linux (Windows は WSL2 の中) で動きます。
 
-wheel の sha256: `fb224d0945729fbca004e6d592542718d15685f08ae4b10ad64d73655efd4067`
+自分でベクトルを用意する使い方は、下の「使い方」にあります。
 
----
+## できること
+
+| できること | 一言 | 段階 |
+|---|---|---|
+| 近いベクトルを探す | cosine・ユークリッド (L2)・内積。グラフをたどる方式と、かたまりに分けて調べる方式の 2 つ | 安定 |
+| 作ったあとの追加・削除・詰め直し | どちらの方式でも | 安定 |
+| 絞り込み検索 | 属性や権限で、探す途中に絞る (あとから削る形ではない) | 安定 |
+| 暗号化した保存 | AES-256-CTR、改ざんは CMAC で検出。鍵違い・壊れたファイルは読み込まない | 安定 |
+| 文章を渡すだけで探す | `kci_vec.text`。長い文章は自動で分ける。日本語と英語の既定のモデルつき | 実験的 |
+| 言葉の一致と合わせて探す | 意味の検索 + 言葉の一致 (BM25 やスパースのモデル)。品番・人名・略語を落とさない | 実験的 |
+| 並べ直しを差し込む | 候補を取り出して、自分の並べ直しのモデルに渡す口 | 実験的 |
+| 同じベクトルをまとめて持つ | 同じ文が何度も入るデータ向け (`kci_vec_set_dedup`) | 安定 |
+| PostgreSQL から使う | 拡張 `pg/`。SQL の関数で呼ぶ | 試作 |
+| いくつものプロセスで索引を共有 | 読み取り専用の像を mmap で開く | 安定 |
+
+方式の系統は、グラフが HNSW、かたまりに分ける方式が ScaNN や faiss fast-scan と同じ「4 ビットの符号と表引き」です。
+
+## 向かない場面と、制限
+
+先に書いておきます。当てはまるなら、ほかの道具のほうが合います。
+
+- **運用を任せたい場合。** KCI-Vec は部品です。伸び縮みするサーバー、複数台への分散、管理画面はありません。
+- **メモリに載らない大きさ。** 索引はメモリの上で探します。SSD に置いたまま探す方式 (DiskANN 系) はまだありません。
+- **質問に文章で答えさせたい場合。** 返すのは「近いもの」までです。答えの文章を作るモデルは別に用意します。
+- 書き込みは 1 本ずつです。探している最中に索引を変える使い方は、Python の層か PostgreSQL の拡張を通してください。
+- 量子化グラフ (グラフ方式を速くする形) は、追加すると作り直しが要ります。
+- L2 と内積の索引は、長さが飛び抜けたベクトルが混じると全体の見積もりが粗くなります。長さのそろったデータ向きです。
+- まったく同じベクトルが多いデータは、そのままだとグラフ方式の recall が下がります。`kci_vec_set_dedup` を使ってください (0.2.8 から)。
+- `kci_vec_set_dedup` を指定した索引と、メモリを先にした量子化グラフ (`kci_vec_build_qg_res`) の索引を保存したファイルは、0.2.7 までの版では読めません (読み込みを断ります)。
+- ARM は素の C の道が中心で、x86 より遅くなります。
+- 配っている Python の部品 (wheel) は、Linux x86-64 用だけです。ソースは Linux と Windows (MinGW-w64) で組み立てと試験を確かめています。
+
+## 測った結果
+
+**すべて開発者自身の計測です。** 相手は公式の設定のまま、KCI-Vec の設定は結果を見ながら選んだものを含みます。
+データ・次元・機械で順位は変わります。
+
+glove-100 (118 万件 × 100 次元)、公式 ANN-Benchmarks の手順、1 コア、recall@10 が 0.90 / 0.95 / 0.99 以上での最良 QPS:
+
+| | Intel Xeon 8375C | AMD Ryzen 9 9950X |
+|---|---|---|
+| KCI-Vec グラフ方式 | 16,253 / 9,851 / 4,414 | 36,951 / 21,800 / 9,440 |
+| KCI-Vec かたまりの方式 | 12,331〜14,725 / 8,694〜10,493 / 3,302〜4,138 | 34,670 / 24,321 / 9,747 |
+| qsgngt 5.0.0 | 16,339〜16,809 / 10,282〜10,618 / 3,408〜3,789 | 27,678 / 15,089 / 6,099 |
+| ScaNN 1.4.2 | 4,438〜4,508 / 2,190〜2,219 / 783〜794 | 15,611 / 8,195 / 3,085 |
+
+![glove-100 の最良 QPS](docs/img/annb_glove100_xeon_9950x_202611.svg)
+
+VIBE (いまの埋め込みモデルのデータでのベンチマーク) の流れ、k = 100、1 コア、9950X、recall@100 が 0.90 / 0.95 / 0.99 以上での最良 QPS
+(KCI-Vec は 0.2.5、glass は同じ機械で 2026-11-19 に測ったもの):
+
+| | yahoo (cosine、384 次元) | agnews (L2、1024 次元) |
+|---|---|---|
+| KCI-Vec グラフ方式 | 21,294 / 18,197 / 12,139 | 13,619 / 9,649 / 5,982 |
+| glass | 14,860 / 11,892 / 8,874 | 9,877 / 7,378 / 4,961 |
+
+- Xeon の glove-100 では、qsgngt と 0.90・0.95 で並ぶか少し下、0.99 で上です。
+- agnews は 0.2.3 からの値です。0.2.2 までは、0.95 から上で glass に届いていませんでした。
+- KCI-Vec の索引は、この 2 つのデータで glass より大きくなります (上の点で、yahoo は 4.9〜5.0 GB に対し 0.7〜0.8 GB、agnews は 5.0〜7.4 GB に対し 2.5〜3.6 GB)。
+  0.2.8 で、メモリを先にした形を足しました (VIBE の流れではまだ測っていません)。
+- 届いていない所もあります。たとえば glove-200 では、どちらの方式も recall 0.99 に届きませんでした。
+- PostgreSQL の中での pgvector との比べは、下の「PostgreSQL から使う」にあります。
+- 順位表への登録: ANN-Benchmarks は申し込み中 ([PR #643](https://github.com/erikbern/ann-benchmarks/pull/643))、VIBE は準備中です。
 
 ## 使い方
 
+### 入れる
+
+```sh
+# Python (Linux x86-64): 配っている部品
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.14/kci_vec-0.2.14-py3-none-manylinux_2_35_x86_64.whl
+
+# ソースから
+sh build_kci_vec.sh          # libkci_vec.{so|dylib} と example_kci_vec   (Linux / macOS)
+# Windows: gcc -O3 -march=native -shared -static -static-libgcc -o libkci_vec.dll kci_vec.c
+# Python:  pip install ./clients/python
+```
+
+### Python (自分でベクトルを用意する)
+
 ```python
-import numpy as np
 from kci_vec import KciVec
 
-v = KciVec(dim=384, rerank=200)            # 並べ直し用に float を残す
-v.add_many(range(len(embeddings)), embeddings)
-v.build_lists()                            # 区分け方式 (グラフ方式なら v.build())
-
-for doc_id, score in v.search(query, k=10):
+v = KciVec(dim=384, rerank=200)          # L2 は metric="l2"、内積は metric="ip"
+v.add_many(ids, embeddings)              # float32 [n, dim]
+v.build_lists()                          # かたまりの方式 (v.build() ならグラフ方式)
+for doc_id, score in v.search(query_vec, k=5):
     ...
-
-allowed = {3, 17, 42}
-hits = v.search(query, k=10, filter=lambda i: i in allowed)   # 属性・権限での絞り込み
-
-v.save("index.kv", key=b"a long secret")   # 暗号化して保存
-v2 = KciVec.load("index.kv", key=b"a long secret")
+hits = v.search(query_vec, k=5, filter=allowed_ids)   # 絞り込み
+v.save("index.kv", key=b"secret")        # 暗号化して保存
 ```
 
-点数は cosine 類似度で、高い順に返ります。たくさんの質問をまとめて探すときは、`v.search_many(queries, k=10)` が `(ids, scores)` の配列を返します。
+### C
 
-**くわしい説明書**: すべての関数、速いグラフの使い方、始めるときの設定、守る決まりは [API_ja.md](https://github.com/KimYuki3/kci-vec-src/blob/main/docs/API_ja.md) にあります。
-
-### ユークリッド (L2) 距離
-
-0.2.0 からの機能です。速さは上の「速さ」の節にあります。`metric="l2"` を渡します。ベクトルの長さはそのまま保たれます (正規化しません)。2 つの探し方、絞り込み、
-暗号化した保存と読み込みは、cosine のときと同じように使えます。
-
-```python
-v = KciVec(dim=128, rerank=200, metric="l2")
-v.add_many(range(len(vectors)), vectors)
-v.build_lists()                            # グラフ方式なら v.build()
-
-for doc_id, dist2 in v.search(query, k=10):   # 距離の 2 乗 |q - x|^2、小さい順
-    ...
+```c
+KciVec *v = kci_vec_new(dim, /*M*/16, /*efc*/200);      // L2: kci_vec_new_l2、内積: kci_vec_new_ip
+kci_vec_add(v, id, float_vec);
+kci_vec_build(v, /*threads*/0, &secs);                   // グラフを作る (0 = 全コア)
+kci_vec_search(v, query, k, /*ef*/100, out_ids, out_scores);
+kci_vec_save(v, "index.kv", key, keylen);                // 鍵を渡せば暗号化 (NULL で平文)
+KciVec *v2 = kci_vec_load("index.kv", key, keylen);
+kci_vec_free(v);
 ```
 
-ユークリッド距離を cosine の索引に写す方法は、特許出願中です (特願2026-241178)。この表示は、その方法だけについてのものです。
+速さが要るときは、スレッドごとに `KciVecSearcher` を作って使い回します。一通りの流れは `example_kci_vec.c`、関数の説明は `kci_vec.h` の宣言の上にあります。
 
-### 内積
+### PostgreSQL から使う (拡張 `pg/`、試作)
 
-0.2.2 からの機能です。`metric="ip"` を渡します。ベクトルの長さはそのまま保たれ、点数は `q·x` で、大きい順に返ります。2 つの探し方、絞り込み、
-暗号化した保存と読み込みは、cosine のときと同じように使えます。内積の検索を cosine の検索に直す、公表済みの方法 (Bachrach ほか、2014 年) を
-使っています。新しい方法ではありません。
-
-```python
-v = KciVec(dim=768, rerank=200, metric="ip")
-v.add_many(range(len(vectors)), vectors)
-v.build()                                  # 区分け方式なら v.build_lists()
-
-for doc_id, score in v.search(query, k=10):   # q·x、大きい順
-    ...
+```sql
+SELECT kci_vec_build('docs', 'docs', 'id', 'embedding');            -- 表 docs(id, embedding) から索引を作る
+SELECT kci_vec_track('docs');                                        -- 以後の INSERT / UPDATE / DELETE を追う
+SELECT id, score FROM kci_vec_search('docs', '[0.1, ...]'::vector, 10);
 ```
 
-質問とデータの分布が違い、質問の見本とその正解が手元にあるとき向けに、0.2.2 には `learn(...)` / `search_learned(...)` と
-`vote_set(...)` / `search_voted(...)` もあります。見本から候補を取る方式で、知られている考え方 (RoarGraph や MLANN の系統) の実装です。
-新しい方法ではありません。くわしくは[配布の説明](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.2)にあります。
+- サーバー・権限・バックアップ・複製は PostgreSQL のものをそのまま使えます。表の更新は検索にすぐ反映されます。
+- 距離は cosine・L2・内積。PostgreSQL 15 / 16 / 17 で試験しています。
+- pgvector と同じ書き方ではありません (`CREATE INDEX` と `<=>` ではなく、関数で呼びます)。
+- 自分で管理する PostgreSQL 向けです。拡張を自由に入れられない管理型のサービスでは使えません。
+- 拡張が持つ索引のファイルは、いまは暗号化していません (ディスクの暗号化と一緒に使ってください)。
 
----
+同じ機械・同じ表・同じ SQL の往復での、pgvector 0.8.1 (HNSW、m 16、ef_construction 200) との比べ
+(glove-100 の 118 万行、1 接続、k = 10、交互に 3 巡、Ryzen 7 8845HS、PostgreSQL 16、2026-11-20):
 
-## 評価用の部品の制限
+| | recall@10 | 問/秒 |
+|---|---|---|
+| KCI-Vec | 0.9005 | 3,261〜3,906 |
+| pgvector (ef_search 240) | 0.8947 | 199〜210 |
+| KCI-Vec | 0.9632 | 1,776〜2,206 |
+| pgvector (ef_search 1000、上限) | 0.9612 | 58〜59 |
 
-- Linux x86-64 のみです。cosine 類似度、ユークリッド (L2) 距離、内積に対応しています。
-- L2: ベクトルの長さが大きく違う (およそ 4 倍を超える) データでは、同じ再現率を出すのに、区分け方式の `nprobe` / `rerank_n` を
-  cosine のときより大きくする必要があります。
-- グラフ方式の詰めた配置は先行版です。まだ保存できず、追加すると作り直すまで外れます。
-- 書き込みは 1 本ずつです。探している最中に索引を変えないでください。
-- 作る間は float のベクトルをメモリに持ちます。SSD に置いたまま探す索引はまだありません。
+1 つのデータ・1 台の機械での値です。同時接続と絞り込みは測っていません。使い方と制限は `pg/README_ja.md`。
 
----
+## 暗号と検査
+
+- 暗号は標準の方式だけです。AES-256-CTR、AES-256-CMAC、鍵は PBKDF2-HMAC-SHA256 と保存ごとのソルトから作ります。
+  AES と CMAC は FIPS-197・SP 800-38B の既知の答えで確かめています。
+- 復号するのは読み込むときだけなので、検索の速さは暗号化しない場合と変わりません。
+- 鍵違い・壊れたファイル・書き換えられたファイルは読み込みません。保存は一時ファイルから名前を付け替えるので、途中で落ちても壊れません。
+- 検査: 悪意のある入力と 32 スレッドの同時負荷で ASan / UBSan の報告 0。
+
+## ソース
+
+C のソース、Python の包み、PostgreSQL の拡張、試験、手順書は [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) にあります。
 
 ## ライセンス
 
-[PolyForm Noncommercial 1.0.0](LICENSE)。ソース ([kci-vec-src](https://github.com/KimYuki3/kci-vec-src)) と同じライセンスです。
-研究・教育・個人・その他の非商用の利用は無償です。商用の利用には別の契約が必要です。
-(2026-11-13 までは、同じ趣旨の自作の非商用ライセンスでした。)
+[PolyForm Noncommercial 1.0.0](LICENSE): 研究・教育・個人・その他の非商用の利用は無償です。商用の利用には別の契約が必要です。
+[kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues) の Issue に一言書いていただければ、非公開の連絡方法をご案内します。
 
 Required Notice: Copyright 2026 Yukihiro Kimura (https://github.com/KimYuki3)
 
-**連絡先** — 質問・不具合の報告・商用の契約のご相談は、このリポジトリの Issue へどうぞ
-([KimYuki3/kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues))。Issue は公開されます。商用のご相談は一言だけ書いていただければ、
-そこから非公開の連絡方法をご案内します。
+ユークリッド距離を cosine の索引に写す方法は、特許出願中です (特願2026-241178)。この表示は、その方法だけについてのものです。
