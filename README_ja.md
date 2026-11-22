@@ -3,7 +3,7 @@
 自分のアプリの中で動く、ベクトル検索のライブラリです。文書や画像の中から、意味の近いものを探します。
 検索サーバーは立てません。データは自分の機械の外に出ません。保存するファイルは暗号化できます。
 
-> このリポジトリは、評価用の配布物 (Python の wheel、Linux x86-64) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.14](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.14)、sha256 `fb224d0945729fbca004e6d592542718d15685f08ae4b10ad64d73655efd4067`)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
+> このリポジトリは、評価用の配布物 (Python の wheel、Linux x86-64) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.15](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.15)、sha256 `6921c419f2bf048f235c46abd72e5ca16adc815bb6e694cc74cbeae01c0da551`)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
 
 *[English](README.md)*
 
@@ -12,7 +12,7 @@
 | 形 | C のファイル 1 つ (`kci_vec.c` + `kci_vec.h`)。ほかのライブラリに依存しません。Python からも呼べます |
 | 向く場面 | 社内のシステム、手元の端末、製品に組み込む検索。データを外のサービスに預けられない所 |
 | 大きさの目安 | 数万〜数百万件。ベクトルは 1 次元 1 バイトで持つので、メモリは float の約 4 分の 1 です |
-| いまの版 | 0.2.14 (2026-11-22)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| いまの版 | 0.2.15 (2026-11-22)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
 | 段階 | 研究段階です。数字はすべて開発者自身の計測で、第三者の確認はまだ受けていません |
 
 ## 最初の 10 分: 文章を入れて、質問する
@@ -110,7 +110,7 @@ VIBE (いまの埋め込みモデルのデータでのベンチマーク) の流
 
 ```sh
 # Python (Linux x86-64): 配っている部品
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.14/kci_vec-0.2.14-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.15/kci_vec-0.2.15-py3-none-manylinux_2_35_x86_64.whl
 
 # ソースから
 sh build_kci_vec.sh          # libkci_vec.{so|dylib} と example_kci_vec   (Linux / macOS)
@@ -186,9 +186,9 @@ C のソース、Python の包み、PostgreSQL の拡張、試験、手順書は
 
 ## ライセンス
 
-[PolyForm Noncommercial 1.0.0](LICENSE): 研究・教育・個人・その他の非商用の利用は無償です。商用の利用には別の契約が必要です。
-[kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues) の Issue に一言書いていただければ、非公開の連絡方法をご案内します。
+[MIT](LICENSE) (版 0.2.15 から): 商用の製品への組み込みを含めて、無償で使う・変える・配ることができます。
+0.2.14 までの版は PolyForm Noncommercial 1.0.0 で公開したもので、そのライセンスのままです。
 
-Required Notice: Copyright 2026 Yukihiro Kimura (https://github.com/KimYuki3)
+Copyright (c) 2026 Yukihiro Kimura (https://github.com/KimYuki3)
 
 ユークリッド距離を cosine の索引に写す方法は、特許出願中です (特願2026-241178)。この表示は、その方法だけについてのものです。

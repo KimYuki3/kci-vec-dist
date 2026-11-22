@@ -3,7 +3,7 @@
 A vector search library that runs inside your own app. It finds the closest matches by meaning among your documents
 or images. There is no search server to run, the data does not leave your machine, and the saved files can be encrypted.
 
-> This repository holds the evaluation package (a Python wheel for Linux x86-64). The wheel is attached to the [releases](https://github.com/KimYuki3/kci-vec-dist/releases) (latest: [v0.2.14](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.14), sha256 `fb224d0945729fbca004e6d592542718d15685f08ae4b10ad64d73655efd4067`). The source is in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src).
+> This repository holds the evaluation package (a Python wheel for Linux x86-64). The wheel is attached to the [releases](https://github.com/KimYuki3/kci-vec-dist/releases) (latest: [v0.2.15](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.15), sha256 `6921c419f2bf048f235c46abd72e5ca16adc815bb6e694cc74cbeae01c0da551`). The source is in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src).
 
 *[日本語](README_ja.md)*
 
@@ -12,7 +12,7 @@ or images. There is no search server to run, the data does not leave your machin
 | Form | One C file (`kci_vec.c` + `kci_vec.h`), no dependencies. Callable from Python |
 | Where it fits | In-house systems, on-device software, search shipped inside a product: places where the data cannot go to an outside service |
 | Size it is meant for | Tens of thousands to a few million items. Vectors are kept at one byte per dimension, about a quarter of the memory of float |
-| Current version | 0.2.14 (2026-11-22). Changes per version: the [releases page](https://github.com/KimYuki3/kci-vec-dist/releases). The evaluation package (wheel) is in [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| Current version | 0.2.15 (2026-11-22). Changes per version: the [releases page](https://github.com/KimYuki3/kci-vec-dist/releases). The evaluation package (wheel) is in [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
 | Stage | Research stage. Every figure was measured by the developer; none has been confirmed by a third party yet |
 
 ## The first ten minutes: put texts in, ask a question
@@ -110,7 +110,7 @@ The VIBE flow (a benchmark on data from current embedding models), k = 100, one 
 
 ```sh
 # Python (Linux x86-64): the distributed package
-pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.14/kci_vec-0.2.14-py3-none-manylinux_2_35_x86_64.whl
+pip install https://github.com/KimYuki3/kci-vec-dist/releases/download/v0.2.15/kci_vec-0.2.15-py3-none-manylinux_2_35_x86_64.whl
 
 # From source
 sh build_kci_vec.sh          # libkci_vec.{so|dylib} and example_kci_vec   (Linux / macOS)
@@ -187,10 +187,9 @@ The C source, the Python client, the PostgreSQL extension, the tests and the gui
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE): free for research, education, personal and other non-commercial use.
-Commercial use needs a separate license — open an issue in
-[kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist/issues) saying so, and a private contact will follow.
+[MIT](LICENSE), from version 0.2.15: free to use, modify and distribute, including in commercial products.
+Versions up to 0.2.14 were released under PolyForm Noncommercial 1.0.0 and stay under it.
 
-Required Notice: Copyright 2026 Yukihiro Kimura (https://github.com/KimYuki3)
+Copyright (c) 2026 Yukihiro Kimura (https://github.com/KimYuki3)
 
 The method that maps Euclidean distance onto the cosine index is patent pending
