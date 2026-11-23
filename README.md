@@ -17,6 +17,8 @@ or images. There is no search server to run, the data does not leave your machin
 
 ## The first ten minutes: put texts in, ask a question
 
+A plain-language explainer of how vector search works, without formulas (in Japanese): ["Where does vector search spend its time?"](https://claude.ai/artifact/ConVBGLKGL9sK5XjJLDvfY).
+
 No knowledge of vectors or models is needed to start. Hand over texts; they are turned into vectors and indexed inside.
 
 ```python
