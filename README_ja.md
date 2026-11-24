@@ -3,7 +3,7 @@
 自分のアプリの中で動く、ベクトル検索のライブラリです。文書や画像の中から、意味の近いものを探します。
 検索サーバーは立てません。データは自分の機械の外に出ません。保存するファイルは暗号化できます。
 
-> このリポジトリは、評価用の配布物 (Python の wheel、Linux x86-64) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.15](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.15)、sha256 `6921c419f2bf048f235c46abd72e5ca16adc815bb6e694cc74cbeae01c0da551`)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
+> このリポジトリは、配布物 (Python の wheel。Linux x86-64、Windows x86-64、macOS) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.16](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.16)。各ファイルの sha256 は release の説明にあります)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
 
 *[English](README.md)*
 
@@ -12,7 +12,7 @@
 | 形 | C のファイル 1 つ (`kci_vec.c` + `kci_vec.h`)。ほかのライブラリに依存しません。Python からも呼べます |
 | 向く場面 | 社内のシステム、手元の端末、製品に組み込む検索。データを外のサービスに預けられない所 |
 | 大きさの目安 | 数万〜数百万件。ベクトルは 1 次元 1 バイトで持つので、メモリは float の約 4 分の 1 です |
-| いまの版 | 0.2.15 (2026-11-22)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| いまの版 | 0.2.16 (2026-11-24)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
 | 段階 | 研究段階です。数字はすべて開発者自身の計測で、第三者の確認はまだ受けていません |
 
 ## 最初の 10 分: 文章を入れて、質問する
@@ -38,7 +38,7 @@ ix.save("my_index", key="合言葉")          # 索引も本文も暗号化し�
 
 入れる所から、自分のファイルを入れて保存し、開き直して質問する所までの手順は
 **[docs/quickstart_text_ja.md](https://github.com/KimYuki3/kci-vec-src/blob/main/docs/quickstart_text_ja.md)** にあります (まっさらな環境で、上から順に打って確かめた手順です)。
-この層 (`kci_vec.text`) は実験的で、いまは Linux (Windows は WSL2 の中) で動きます。
+この層 (`kci_vec.text`) は実験的です。言語モデルを使う形で動かして確かめたのは Linux だけです。Windows と macOS では、モデルを使わない設定 (`mode="sparse", sparse="bm25"`) だけを確かめています。
 
 自分でベクトルを用意する使い方は、下の「使い方」にあります。
 
@@ -72,7 +72,7 @@ ix.save("my_index", key="合言葉")          # 索引も本文も暗号化し�
 - まったく同じベクトルが多いデータは、そのままだとグラフ方式の recall が下がります。`kci_vec_set_dedup` を使ってください (0.2.8 から)。
 - `kci_vec_set_dedup` を指定した索引と、メモリを先にした量子化グラフ (`kci_vec_build_qg_res`) の索引を保存したファイルは、0.2.7 までの版では読めません (読み込みを断ります)。
 - ARM は素の C の道が中心で、x86 より遅くなります。
-- 配っている Python の部品 (wheel) は、Linux x86-64 用だけです。ソースは Linux と Windows (MinGW-w64) で組み立てと試験を確かめています。
+- 配っている Python の部品 (wheel、0.2.16 から): Linux x86-64 (AVX2。AVX-512 があれば使う)、Windows x86-64 (AVX2)、macOS (Apple シリコン、AVX2 のある 2013 年以降の Intel の Mac)。Windows と Intel の Mac の部品は AVX2 用の 1 種類だけです。AVX2 の無い Intel の Mac は確かめずに落ちます。macOS の部品は、借りた組み立て用の機械で作って試したもので、手元の Mac では確かめていません。
 
 ## 測った結果
 
@@ -111,7 +111,7 @@ VIBE (いまの埋め込みモデルのデータでのベンチマーク) の流
 ### 入れる
 
 ```sh
-# Python (Linux x86-64): 配っている部品
+# Python (Linux x86-64、Windows x86-64、macOS): 配っている部品
 pip install kci-vec
 
 # ソースから
