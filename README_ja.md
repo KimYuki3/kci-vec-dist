@@ -3,7 +3,7 @@
 自分のアプリの中で動く、ベクトル検索のライブラリです。文書や画像の中から、意味の近いものを探します。
 検索サーバーは立てません。データは自分の機械の外に出ません。保存するファイルは暗号化できます。
 
-> このリポジトリは、配布物 (Python の wheel。Linux x86-64、Windows x86-64、macOS) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.16](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.16)。各ファイルの sha256 は release の説明にあります)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
+> このリポジトリは、配布物 (Python の wheel。Linux x86-64、Windows x86-64、macOS) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.17](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.17)。各ファイルの sha256 は release の説明にあります)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
 
 *[English](README.md)*
 
@@ -11,8 +11,8 @@
 |---|---|
 | 形 | C のファイル 1 つ (`kci_vec.c` + `kci_vec.h`)。ほかのライブラリに依存しません。Python からも呼べます |
 | 向く場面 | 社内のシステム、手元の端末、製品に組み込む検索。データを外のサービスに預けられない所 |
-| 大きさの目安 | 数万〜数百万件。ベクトルは 1 次元 1 バイトで持つので、メモリは float の約 4 分の 1 です |
-| いまの版 | 0.2.16 (2026-11-24)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| 大きさの目安 | 数万〜数百万件。探すのは 1 次元 1 バイトの行の上です。既定では、上位の候補を正確に比べ直すために float のベクトルも持ちます。`rerank=0` にすると 1 バイトの行だけになり、メモリは float の約 4 分の 1 ですが、取りこぼしが増えます |
+| いまの版 | 0.2.17 (2026-11-25)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
 | 段階 | 研究段階です。数字はすべて開発者自身の計測で、第三者の確認はまだ受けていません |
 
 ## 最初の 10 分: 文章を入れて、質問する
@@ -104,7 +104,7 @@ VIBE (いまの埋め込みモデルのデータでのベンチマーク) の流
   0.2.8 で、メモリを先にした形を足しました (VIBE の流れではまだ測っていません)。
 - 届いていない所もあります。たとえば glove-200 では、どちらの方式も recall 0.99 に届きませんでした。
 - PostgreSQL の中での pgvector との比べは、下の「PostgreSQL から使う」にあります。
-- 順位表への登録: ANN-Benchmarks は申し込み中 ([PR #643](https://github.com/erikbern/ann-benchmarks/pull/643))、VIBE は準備中です。
+- 順位表への登録: VIBE に申し込み中です ([PR #21](https://github.com/vector-index-bench/vibe/pull/21)。返事はまだありません)。ANN-Benchmarks は保守が止まっているので、申し込みを取り下げました。
 
 ## 使い方
 
