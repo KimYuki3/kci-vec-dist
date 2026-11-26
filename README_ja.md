@@ -3,7 +3,7 @@
 自分のアプリの中で動く、ベクトル検索のライブラリです。文書や画像の中から、意味の近いものを探します。
 検索サーバーは立てません。データは自分の機械の外に出ません。保存するファイルは暗号化できます。
 
-> このリポジトリは、配布物 (Python の wheel。Linux x86-64、Windows x86-64、macOS) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.17](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.17)。各ファイルの sha256 は release の説明にあります)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
+> このリポジトリは、配布物 (Python の wheel。Linux x86-64、Windows x86-64、macOS) の置き場です。wheel は [Releases](https://github.com/KimYuki3/kci-vec-dist/releases) にあります (最新: [v0.2.18](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.18)。各ファイルの sha256 は release の説明にあります)。ソースは [kci-vec-src](https://github.com/KimYuki3/kci-vec-src) です。
 
 *[English](README.md)*
 
@@ -12,7 +12,7 @@
 | 形 | C のファイル 1 つ (`kci_vec.c` + `kci_vec.h`)。ほかのライブラリに依存しません。Python からも呼べます |
 | 向く場面 | 社内のシステム、手元の端末、製品に組み込む検索。データを外のサービスに預けられない所 |
 | 大きさの目安 | 数万〜数百万件。探すのは 1 次元 1 バイトの行の上です。既定では、上位の候補を正確に比べ直すために float のベクトルも持ちます。`rerank=0` にすると 1 バイトの行だけになり、メモリは float の約 4 分の 1 ですが、取りこぼしが増えます |
-| いまの版 | 0.2.17 (2026-11-25)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| いまの版 | 0.2.18 (2026-11-26)。版ごとの変更は [配布のページ](https://github.com/KimYuki3/kci-vec-dist/releases)。評価用の配布物 (wheel) は [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
 | 段階 | 研究段階です。数字はすべて開発者自身の計測で、第三者の確認はまだ受けていません |
 
 ## 最初の 10 分: 文章を入れて、質問する
