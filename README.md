@@ -3,7 +3,7 @@
 A vector search library that runs inside your own app. It finds the closest matches by meaning among your documents
 or images. There is no search server to run, the data does not leave your machine, and the saved files can be encrypted.
 
-> This repository holds the packages (Python wheels for Linux x86-64, Windows x86-64 and macOS). The wheel is attached to the [releases](https://github.com/KimYuki3/kci-vec-dist/releases) (latest: [v0.2.18](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.18); the sha256 of each file is in the release notes). The source is in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src).
+> This repository holds the packages (Python wheels for Linux x86-64, Windows x86-64 and macOS). The wheel is attached to the [releases](https://github.com/KimYuki3/kci-vec-dist/releases) (latest: [v0.2.19](https://github.com/KimYuki3/kci-vec-dist/releases/tag/v0.2.19); the sha256 of each file is in the release notes). The source is in [kci-vec-src](https://github.com/KimYuki3/kci-vec-src).
 
 *[日本語](README_ja.md)*
 
@@ -12,7 +12,7 @@ or images. There is no search server to run, the data does not leave your machin
 | Form | One C file (`kci_vec.c` + `kci_vec.h`), no dependencies. Callable from Python |
 | Where it fits | In-house systems, on-device software, search shipped inside a product: places where the data cannot go to an outside service |
 | Size it is meant for | Tens of thousands to a few million items. The search runs on one byte per dimension. By default the float vectors are kept beside them, to score the best candidates exactly; with `rerank=0` only the bytes are kept, about a quarter of the memory of float, at a lower recall |
-| Current version | 0.2.18 (2026-11-26). Changes per version: the [releases page](https://github.com/KimYuki3/kci-vec-dist/releases). The evaluation package (wheel) is in [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
+| Current version | 0.2.19 (2026-11-28). Changes per version: the [releases page](https://github.com/KimYuki3/kci-vec-dist/releases). The evaluation package (wheel) is in [kci-vec-dist](https://github.com/KimYuki3/kci-vec-dist) |
 | Stage | Research stage. Every figure was measured by the developer; none has been confirmed by a third party yet |
 
 ## The first ten minutes: put texts in, ask a question
